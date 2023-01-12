@@ -558,6 +558,7 @@ export const sidebar: ThemeConfig['sidebar'] = {
 export default defineConfigWithTheme<ThemeConfig>({
   extends: baseConfig,
 
+  base: '/',
   lang: 'en-US',
   title: 'Volar.js',
   description: 'Volar.js - The Embedded Language Tooling Framework',
