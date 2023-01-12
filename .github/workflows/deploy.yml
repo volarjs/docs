@@ -15,7 +15,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: pnpm
+
+      - run: npm i -g pnpm
       - run: pnpm install --frozen-lockfile
 
       - name: Build
