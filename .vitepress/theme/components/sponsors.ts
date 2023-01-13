@@ -32,8 +32,8 @@ export const load = async () => {
         {
           name: 'Nuxt',
           url: 'https://nuxtjs.org',
-          img: 'https://raw.githubusercontent.com/johnsoncodehk/volar/master/.github/sponsors/nuxt.svg',
-          description: 'The Intuitive Vue Framework',
+          img: 'https://nuxt.com/assets/design-kit/logo/full-logo-green-dark.svg',
+          description: 'The preferred way to start with Vue.',
         }
       ],
       platinum: [],
