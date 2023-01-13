@@ -59,15 +59,13 @@ onMounted(async () => {
     <div class="vt-box">
       <h2>Standard</h2>
       <p>
-        The IDE behavior for embedded languages is consistent with the behavior of individual IDE plugins for the
-        language itself.
+        IDE behavior of embedded languages is consistent with its official IDE plugin.
       </p>
     </div>
     <div class="vt-box">
       <h2>Performant</h2>
       <p>
-        Performance issues that would take at least months of exploration and debugging are already resolved internally
-        by the framework.
+        Framework internally resolved some performance issues that need months of work.
       </p>
     </div>
     <!-- <div class="vt-box">
@@ -85,9 +83,9 @@ onMounted(async () => {
       </p>
     </div> -->
     <div class="vt-box">
-      <h2>Reputation</h2>
+      <h2>Reliability</h2>
       <p>
-        Language tools created through the framework are serving millions of people.
+        Our tools created via framework are serving hundreds of thousands of users every month.
       </p>
     </div>
     <!-- <div class="vt-box">
