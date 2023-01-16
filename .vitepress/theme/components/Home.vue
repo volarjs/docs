@@ -20,7 +20,7 @@ onMounted(async () => {
       <br />Tooling Framework
     </h1>
     <p class="description">
-      A rationally designed framework for building embedded language tools. Incubated from Vue.
+      A rationally designed framework for building embedded language tools. Incubated from Vue ecosystem.
     </p>
     <p class="actions">
       <vue-mastery-modal @click="showVueDemo = !showVueDemo" :class="{ disabled: showVueDemo }" />
@@ -65,7 +65,7 @@ onMounted(async () => {
     <div class="vt-box">
       <h2>Performant</h2>
       <p>
-        Framework internally resolved some performance issues that need months of work.
+        Some performance issues that need months of work have been resolved in framework internally.
       </p>
     </div>
     <!-- <div class="vt-box">
