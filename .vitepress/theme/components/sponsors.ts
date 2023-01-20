@@ -36,14 +36,15 @@ export const load = async () => {
           description: 'The preferred way to start with Vue.',
         }
       ],
-      platinum: [],
-      platinum_china: [],
-      gold: [
+      platinum: [
         {
           name: 'Vue',
           url: 'https://vuejs.org/',
           img: 'https://raw.githubusercontent.com/johnsoncodehk/volar/master/.github/sponsors/vue.png',
         },
+      ],
+      platinum_china: [],
+      gold: [
         {
           name: 'Volta',
           url: 'https://volta.net/',
