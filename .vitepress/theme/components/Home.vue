@@ -20,7 +20,7 @@ onMounted(async () => {
       <br />Tooling Framework
     </h1>
     <p class="description">
-      A rationally designed framework for building embedded language tools.
+      A rationally designed framework for building embedded programming language tools.
       <br />Incubated from Vue ecosystem.
     </p>
     <p class="actions">
