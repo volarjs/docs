@@ -11,6 +11,7 @@ import SponsorsAside from './components/SponsorsAside.vue'
 import VueSchoolLink from './components/VueSchoolLink.vue'
 import NavbarTitle from './components/NavbarTitle.vue'
 // import Banner from './components/Banner.vue'
+import vueJumpPlugin from 'vite-plugin-vue-jump/client';
 
 export default Object.assign({}, VPTheme, {
   Layout: () => {
@@ -27,5 +28,6 @@ export default Object.assign({}, VPTheme, {
     app.provide('prefer-sfc', preferSFC)
     app.provide('filter-headers', filterHeadersByPreference)
     app.component('VueSchoolLink', VueSchoolLink)
+    app.use(vueJumpPlugin);
   }
 })

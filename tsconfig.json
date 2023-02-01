@@ -14,5 +14,6 @@
       "@theme/*": [".vitepress/theme/*"]
     }
   },
-  "include": ["env.d.ts", "src/**/*", ".vitepress/**/*"]
+  "include": ["env.d.ts", "src/**/*", ".vitepress/**/*"],
+  "exclude": [".vitepress/dist"]
 }

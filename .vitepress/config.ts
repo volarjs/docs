@@ -1,9 +1,8 @@
-import fs from 'fs'
-import path from 'path'
 import { defineConfigWithTheme } from 'vitepress'
 import type { Config as ThemeConfig } from '@vue/theme'
 import baseConfig from '@vue/theme/config'
 import { headerPlugin } from './headerMdPlugin'
+import { createVuePluginOptions, searchPackageJson } from 'vite-plugin-vue-jump';
 
 const nav: ThemeConfig['nav'] = [
   {
@@ -695,7 +694,16 @@ export default defineConfigWithTheme<ThemeConfig>({
     }
   },
 
-  vue: {
-    reactivityTransform: true
-  }
+  vue: createVuePluginOptions(
+    { reactivityTransform: true },
+    (filePath) => {
+      const info = searchPackageJson(filePath);
+      if (info?.packageJson.name === '@vue/theme') {
+        return 'https://github.com/vuejs/theme/tree/main/' + info.fileRelativePath;
+      }
+      else if (info?.packageJson.name === '@volar/docs') {
+        return 'https://github.com/volarjs/volarjs.github.io/blob/master/' + info.fileRelativePath;
+      }
+    },
+  )
 })
