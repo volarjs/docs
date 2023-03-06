@@ -44,23 +44,12 @@ export const load = async () => {
         },
       ],
       platinum_china: [],
-      gold: [
-        {
-          name: 'Volta',
-          url: 'https://volta.net/',
-          img: 'https://raw.githubusercontent.com/johnsoncodehk/volar/master/.github/sponsors/volta.svg',
-        },
-      ],
+      gold: [],
       silver: [
         {
           name: 'Prefect',
           url: 'https://www.prefect.io/',
           img: 'https://raw.githubusercontent.com/johnsoncodehk/volar/master/.github/sponsors/prefect.svg',
-        },
-        {
-          name: '365Talents',
-          url: 'https://github.com/365talents',
-          img: 'https://raw.githubusercontent.com/johnsoncodehk/volar/master/.github/sponsors/365talents.png',
         },
       ],
       bronze: [],
