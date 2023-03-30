@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 16
 
-      - run: npm i -g pnpm
+      - run: npm i -g pnpm@7
       - run: pnpm install --frozen-lockfile
 
       - name: Build
