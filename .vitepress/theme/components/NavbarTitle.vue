@@ -1,7 +1,7 @@
 <template>
     <a class="VPNavBarTitle" href="/">
         <slot name="navbar-title">
-            <svg width="24" height="24" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="logo" width="24" height="24" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_301_115)">
                     <path
                         d="M266.392 430C261.773 438 250.226 438 245.608 430L44.6898 82C40.071 74 45.8445 64 55.0821 64L456.918 64C466.156 64 471.929 74 467.31 82L266.392 430Z"
