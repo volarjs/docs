@@ -1,25 +1,51 @@
-# vuejs.org
+# Starlight Starter Kit: Basics
 
-## Contributing
-
-This site is built with [VitePress](https://github.com/vuejs/vitepress) and depends on [@vue/theme](https://github.com/vuejs/vue-theme). Site content is written in Markdown format located in `src`. For simple edits, you can directly edit the file on GitHub and generate a Pull Request.
-
-For local development, [pnpm](https://pnpm.io/) is preferred as package manager:
-
-```bash
-pnpm i
-pnpm run dev
+```
+npm create astro@latest -- --template starlight
 ```
 
-This project requires Node.js to be `v14.0.0` or higher, because we use new JavaScript features in our code, such as optional chaining.
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/starlight/tree/main/examples/basics)
+[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/starlight/tree/main/examples/basics)
 
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-## Working on the content
+## 🚀 Project Structure
 
-- See VitePress docs on supported [Markdown Extensions](https://vitepress.vuejs.org/guide/markdown.html) and the ability to [use Vue syntax inside markdown](https://vitepress.vuejs.org/guide/using-vue.html).
+Inside of your Astro + Starlight project, you'll see the following folders and files:
 
-- See the [Writing Guide](https://github.com/vuejs/docs/blob/main/.github/contributing/writing-guide.md) for our rules and recommendations on writing and maintaining documentation content.
+```
+.
+├── public/
+├── src/
+│   ├── assets/
+│   ├── content/
+│   │   ├── docs/
+│   │   └── config.ts
+│   └── env.d.ts
+├── astro.config.mjs
+├── package.json
+└── tsconfig.json
+```
 
-## Working on the theme
+Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
 
-If changes need to made for the theme, check out the [instructions for developing the theme alongside the docs](https://github.com/vuejs/vue-theme#developing-with-real-content).
+Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+
+Static assets, like favicons, can be placed in the `public/` directory.
+
+## 🧞 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:3000`      |
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).

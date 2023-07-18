@@ -1,0 +1,12 @@
+---
+title: Embedded languages
+description: A guide in my new Starlight docs site.
+---
+
+In the web, most programming languages are composed of other programming languages. The most common example being HTML, in which you will find JavaScript and CSS in `<script>` and `<style>` blocks respectively. You can even find some inline CSS in the `style` attribute of HTML elements, and some inline JavaScript in the `onclick` (and other events) attribute of HTML elements.
+
+There is actually a remarkable amount of examples of this behaviour: The different blocks in [Vue's Single-File Components](https://vuejs.org/guide/scaling-up/sfc.html), the sections in [Svelte's components](https://svelte.dev/docs/svelte-components) or the frontmatter syntax and JSX-based component template of [Astro's components](https://docs.astro.build/en/core-concepts/astro-components/).
+
+As such, Volar was built on the principle that it is highly likely that your language will have such embedded languages and has top-notch support for them. Notably, Volar can drastically simplify the mappings needed to get editing features working across the different parts of your files.
+
+**If your language does not have embedded languages: That's completely okay!** Volar will still work for you just as well, and it will be ready if one day you do decide to add embedded languages to your language.

@@ -1,0 +1,135 @@
+---
+title: Your First Volar Language Server
+description: A guide in my new Starlight docs site.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+In this guide, we will create a simple Volar language server and VS Code client. To keep things simple, it will look suspiciously like HTML, albeit with one twist: Only one `<style>` tag will be allowed. **We'll call it HTML1.**
+
+> 💡 Interested in seeing the final product? Check out the [starter project](https://github.com/volarjs/starter) on GitHub.
+
+## Prerequisites
+
+- [Visual Studio Code](https://code.visualstudio.com/) version 1.55 or higher.
+- [Node.js](https://nodejs.org/en/) version 14 or higher.
+- Basic knowledge of JavaScript and Node.
+
+## Getting Started
+
+We'll first create a new project directory and initialize a new Node.js project.
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# create a new project with npm
+npm init
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# create a new project with pnpm
+pnpm init .
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# create a new project with yarn
+yarn init .
+```
+
+</TabItem>
+</Tabs>
+
+In order to be able to have both the language server and the VS Code client in the same repository, [a common pattern for language servers](/guides/file-structure), we'll create a new `packages` directory that will contain both parts, this is effectively known as a monorepo.
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# create a new project with npm
+npm init -w ./packages/server
+npm init -w ./packages/client
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# create a new project with pnpm
+mkdir -p ./packages/server ./packages/client
+echo -e 'packages:\n  - "packages/*"' > pnpm-workspace.yaml
+# Go into both newly created folders in packages and run `pnpm init`
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# create a new project with yarn
+yarn init -w ./packages/server
+yarn init -w ./packages/client
+```
+
+</TabItem>
+</Tabs>
+
+### The client
+
+Since this guide mainly focuses on creating a server we'll start by creating the client so that we can get that out of the way. The client will be a VS Code extension, which necessitate [a `package.json` with a few specific fields](https://code.visualstudio.com/api/references/extension-manifest). As such, update your `package.json` to look like this:
+
+```json
+{
+  "name": "client",
+  "displayName": "HTML1 Client",
+  "description": "A VS Code extension for HTML1.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.55.0"
+  },
+  "activationEvents": ["onLanguage:html1"],
+  "main": "./src/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "html1",
+        "extensions": [".html1"]
+      }
+    ]
+  }
+}
+```
+
+We'll also be installing a few dependencies from Volar and VS Code. Run the following command to install them:
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# create a new project with npm
+npm install @volar/language-server @volar/vscode vscode-languageclient ../server
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# create a new project with pnpm
+pnpm install @volar/language-server @volar/vscode vscode-languageclient ../server
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# create a new project with yarn
+yarn install @volar/language-server @volar/vscode vscode-languageclient ../server
+```
+
+</TabItem>
+</Tabs>

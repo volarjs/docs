@@ -1,19 +1,9 @@
 {
-  "compilerOptions": {
-    "outDir": "dist",
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "strict": true,
-    "jsx": "preserve",
-    "baseUrl": ".",
+  "extends": "astro/tsconfigs/strict",
+	"compilerOptions": {
+		"baseUrl": "./",
     "paths": {
-      "@theme/*": [".vitepress/theme/*"]
+      "$components/*": ["src/components/*"],
     }
-  },
-  "include": ["env.d.ts", "src/**/*", ".vitepress/**/*"],
-  "exclude": [".vitepress/dist"]
+	}
 }
