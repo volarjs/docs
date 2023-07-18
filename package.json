@@ -7,13 +7,14 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier -w --cache ."
   },
   "dependencies": {
     "@astrojs/starlight": "^0.5.3",
     "astro": "^2.8.4",
     "sharp": "^0.32.1",
-		"prettier": "^3.0.0",
-		"prettier-plugin-astro": "^0.11.0"
+    "prettier": "^3.0.0",
+    "prettier-plugin-astro": "^0.11.0"
   }
 }
