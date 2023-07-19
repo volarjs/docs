@@ -16,5 +16,6 @@
     "sharp": "^0.32.1",
     "prettier": "^3.0.0",
     "prettier-plugin-astro": "^0.11.0"
-  }
+  },
+  "packageManager": "pnpm@8.6.7"
 }
