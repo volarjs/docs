@@ -7,8 +7,8 @@ hero:
   image:
     file: ../../assets/logo.svg
   actions:
-    - text: Getting Started
-      link: /guides/example/
+    - text: Why Volar?
+      link: /core-concepts/why-volar
       icon: right-arrow
       variant: primary
     - text: Starter project
@@ -22,6 +22,9 @@ hero:
 ---
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
+import Sponsors from "$components/Sponsors.astro";
+
+<Sponsors />
 
 <CardGrid>
   <Card title="Performant" icon="rocket">
@@ -37,3 +40,5 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
     Learn more in [the Starlight Docs](https://starlight.astro.build/).
   </Card>
 </CardGrid>
+
+## Team

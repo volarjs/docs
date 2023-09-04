@@ -3,7 +3,7 @@ import { defineConfig, sharpImageService } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://volarjs.github.io",
+  site: "https://volarjs.dev/",
   integrations: [
     starlight({
       logo: {
@@ -15,7 +15,13 @@ export default defineConfig({
       social: {
         github: "https://github.com/volarjs/",
         twitter: "https://twitter.com/johnsoncodehk",
+        discord: "https://discord.gg/Ha7XJbMJZc",
       },
+      customCss: ["./src/styles/custom.css"],
+      editLink: {
+        baseUrl: "https://github.com/volarjs/docs/edit/main/",
+      },
+      lastUpdated: true,
       sidebar: [
         {
           label: "Core Concepts",
