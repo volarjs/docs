@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: latest
           package-manager: pnpm
+          pnpm-version: 8.7.1
 
   deploy:
     needs: build
