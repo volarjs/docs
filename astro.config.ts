@@ -29,7 +29,7 @@ export default defineConfig({
             // Each item here is one entry in the navigation menu.
             { label: "Why Volar?", link: "/core-concepts/why-volar" },
             { label: "Embedded Languages", link: "/core-concepts/embedded-languages" },
-            { label: "Volar Labs", link: "/core-concepts/volar-labs" },
+            { label: "Volar.js Labs", link: "/core-concepts/volar-labs" },
           ],
           // TODO: Use `autogenerate` once it allows you to order the sidebar
         },
