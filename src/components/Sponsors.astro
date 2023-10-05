@@ -1,24 +1,29 @@
 ---
-import { Image } from "astro:assets";
-import nuxt from "../assets/sponsors/nuxt.svg";
-import prefect from "../assets/sponsors/prefect.svg";
-import stackblitz from "../assets/sponsors/stackblitz.svg";
-import vue from "../assets/sponsors/vue.svg";
+import nuxt from "../assets/sponsors/nuxt.svg?raw";
+import prefect from "../assets/sponsors/prefect.svg?raw";
+import stackblitz from "../assets/sponsors/stackblitz.svg?raw";
+import vue from "../assets/sponsors/vue.svg?raw";
 ---
 
 <hr />
 <section id="sponsors">
   <h2>Sponsors</h2>
 
-  <a href="https://stackblitz.com"><Image src={stackblitz} alt="StackBlitz's logo" /></a>
+  <a href="https://stackblitz.com">
+    <Fragment set:html={stackblitz} />
+  </a>
 
-  <a href="https://vuejs.org/"><Image src={vue} alt="Vue's logo" /></a>
+  <a href="https://vuejs.org/">
+    <Fragment set:html={vue} />
+  </a>
 
-  <a href="https://nuxt.com/"><Image src={nuxt} alt="Nuxt's logo" /></a>
+  <a href="https://nuxt.com/">
+    <Fragment set:html={nuxt} />
+  </a>
 
-  <a href="https://www.prefect.io/"
-    ><Image src={prefect} alt="Prefect's Logo" style="width: 196px;" /></a
-  >
+  <a href="https://www.prefect.io/">
+    <Fragment set:html={prefect} />
+  </a>
 </section>
 
 <hr style="margin-bottom: 5rem;" />
@@ -44,10 +49,21 @@ import vue from "../assets/sponsors/vue.svg";
     align-self: center;
   }
 
-  @media screen and (max-width: 50em) {
+  @media screen and (max-width: 1024px) {
     #sponsors {
       justify-content: center;
       max-height: fit-content;
     }
+
+    #sponsors h2 {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<style is:global>
+  :root[data-theme="light"] .sponsor-name {
+    fill: black;
   }
 </style>
