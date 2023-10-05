@@ -1,51 +1,45 @@
-# Starlight Starter Kit: Basics
+# volarjs/docs <img align="right" valign="center" height="96" width="96" src="https://volarjs.dev/favicon.svg" alt="VolarJS logo" />
 
-```
-npm create astro@latest -- --template starlight
-```
+Welcome to the repo for the [VolarJS](https://github.com/volarjs/volar.js) documentation! This repo contains the source code we use to build our site (and of course, its content)
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/starlight/tree/main/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/starlight/tree/main/examples/basics)
+For more information on what Volar itself is, check out [the main repository](https://github.com/volarjs/volar.js), or [the website itself](https://volarjs.dev/).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/volarjs/docs)
+[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/github.com/volarjs/docs)
+[![Open in Codeflow](https://developer.stackblitz.com/img/open_in_codeflow.svg)](https://pr.new/github.com/volarjs/docs)
 
-## 🚀 Project Structure
+## Contributing
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
+Contributions of all size are welcome! If you find a typo, or want to clarify some language, or even want to add a whole new section, no matter what, we're happy to welcome your contributions.
 
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   ├── docs/
-│   │   └── config.ts
-│   └── env.d.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
-```
+If you can see what the problem is, and you know how to fix it, then definitely feel free to make a PR (pull request) with the change and contribute to this repo yourself. Alternatively, [opening an issue](https://github.com/volarjs/docs/issues/new) and letting us know about the problem is also a totally valid option.
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+### Getting the project running locally
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+If you want to run VolarJS locally, you can do so by following these steps:
 
-Static assets, like favicons, can be placed in the `public/` directory.
+1. Clone the repo: `git clone https://github.com/volarjs/docs`
 
-## 🧞 Commands
+2. Install dependencies: `npm install`
 
-All commands are run from the root of the project, from a terminal:
+3. Run the site locally: `npm run dev`
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:3000`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+4. Open the site in your browser: <http://localhost:4321>
 
-## 👀 Want to learn more?
+You can now open up the project in your favorite editor and start making changes. To make changes to the content, edit files in the `src/content` directory.
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+### Sponsors
+
+<p align="center">
+  <a href="https://cdn.jsdelivr.net/gh/johnsoncodehk/sponsors/company/sponsors.svg">
+    <img src="https://cdn.jsdelivr.net/gh/johnsoncodehk/sponsors/company/sponsors.svg"/>
+  </a>
+</p>
+
+---
+
+<p align="center">
+  <a href="https://cdn.jsdelivr.net/gh/johnsoncodehk/sponsors/sponsors.svg">
+    <img src="https://cdn.jsdelivr.net/gh/johnsoncodehk/sponsors/sponsors.svg"/>
+  </a>
+</p>
