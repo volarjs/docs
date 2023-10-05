@@ -28,6 +28,6 @@
   --sl-color-black: #ffffff;
 }
 
-:root[data-theme="light"] #sponsor-icon {
+:root[data-theme="light"] #name {
   fill: black;
 }
