@@ -1,5 +1,62 @@
 ---
-title: "File Structure of a typical Volar project"
+title: "File Structure of typical Volar project"
 ---
 
-> This page is a stub. Interested in contributing some documentation to it, or want to improve it? [Edit this page on GitHub](https://github.com/volarjs/docs/blob/main/src/content/docs/guides/file-structure.mdx)
+This guide will show you how a Volar project is organized and what the different files in your project do.
+
+## Files and directories
+
+Due to needing multiple packages to run the language server and VS Code extension, a Volar project will typically live in a monorepo. This is not a requirement, but it is the most common setup and recommended way to set up a Volar project.
+
+### Server (`packages/language-server`)
+
+All files related to the language server are located in the `packages/language-server` directory.
+
+- `package.json` — Configuration for the language server package, including its dependencies and main entry point.
+- `bin/server.js` — The entry point for the language server binary. This file is responsible for starting the language server.
+- `src/index.ts` — Main file for the language server, setting up the server and its capabilities.
+- `src/language.ts` — Defines the language capabilities and provides methods for handling the project's files.
+
+### Client (`packages/vscode`)
+
+All files related to the VS Code extension are located in the `packages/vscode` directory.
+
+- `package.json` — Configuration for the VS Code extension package, including its dependencies, main entry point, and activation events.
+- `src/extension.ts` — Main file for the VS Code extension, setting up the client and activating features.
+- `scripts/build.js` — Script for building the VS Code extension.
+
+## Full example
+
+Your Volar project will, in most cases, look similar to the following:
+
+import FileTree from "../../../components/Filetree.astro";
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+  - tasks.json
+- packages/
+  - language-server/
+    - bin/
+      - server.js
+    - src/
+      - index.ts
+      - ...
+    - package.json
+    - tsconfig.json
+  - vscode/
+    - scripts/
+      - build.js
+    - src/
+      - extension.ts
+      - ...
+    - .vscodeignore
+    - package.json
+    - tsconfig.json
+- package.json
+- tsconfig.json
+
+</FileTree>
+
+Some generic files such as `README.md` were omitted for brevity.
