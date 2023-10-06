@@ -1,0 +1,18 @@
+---
+interface Props {
+  svg: string;
+}
+
+const { svg } = Astro.props;
+---
+
+<Fragment set:html={svg} />
+
+<style is:global>
+  #sponsor-icon {
+    margin: 0;
+    height: 42px;
+    width: 100%;
+    color: white;
+  }
+</style>
