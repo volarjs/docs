@@ -1,5 +1,53 @@
 ---
-title: "File Structure of a typical Volar project"
+title: "File Structure of typical Volar project"
 ---
 
-> This page is a stub. Interested in contributing some documentation to it, or want to improve it? [Edit this page on GitHub](https://github.com/volarjs/docs/blob/main/src/content/docs/guides/file-structure.mdx)
+This guide will show you how a Volar project is organized and what the different files in your project do.
+
+## Files and directories
+
+- `.vscode/tasks.json` — Contains tasks for the VS Code environment, such as compiling and watching for changes.
+- `README.md` — The main documentation file for the repository, providing an overview of the project, tools used, and instructions for running the sample.
+- `package.json` — The main package configuration file, containing scripts, dependencies, and other metadata.
+- `packages/language-server/bin/html1-language-server.js` — The entry point for the HTML1 language server.
+- `packages/language-server/package.json` — Configuration for the language server package, including its dependencies and main entry point.
+- `packages/language-server/src/index.ts` — Main file for the language server, setting up the server and its capabilities.
+- `packages/language-server/src/language.ts` — Defines the language capabilities and provides methods for handling HTML1 files.
+- `packages/vscode/package.json` — Configuration for the VS Code extension package, including its dependencies, main entry point, and activation events.
+- `packages/vscode/scripts/build.js` — Script for building the VS Code extension using esbuild.
+- `packages/vscode/src/extension.ts` — Main file for the VS Code extension, setting up the client and activating features.
+- `sample/test.html1` — A sample HTML1 file to demonstrate the capabilities of the language server and VS Code extension.
+
+## Example project contents
+
+The Volar project directory might look like this:
+
+import FileTree from "../../../components/Filetree.astro";
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+  - tasks.json
+- packages/
+  - language-server/
+    - bin/
+      - html1-language-server.js
+    - src/
+      - package.json
+      - tsconfig.json
+  - vscode/
+    - scripts/
+      - build.js
+    - src/
+      - extension.ts
+    - .vscodeignore
+    - package.json
+    - tsconfig.json
+- sample/
+  - test.html1
+- package.json
+- tsconfig.base.json
+- tsconfig.build.json
+
+</FileTree>
