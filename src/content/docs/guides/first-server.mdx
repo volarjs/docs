@@ -52,7 +52,7 @@ In order to be able to have both the language server and the VS Code client in t
 <TabItem label="npm">
 
 ```sh
-# create a new project with npm
+# create a new monorepo project with npm
 npm init -w ./packages/server
 npm init -w ./packages/client
 ```
@@ -61,7 +61,7 @@ npm init -w ./packages/client
 <TabItem label="pnpm">
 
 ```sh
-# create a new project with pnpm
+# create a new monorepo project with pnpm
 mkdir -p ./packages/server ./packages/client
 echo -e 'packages:\n  - "packages/*"' > pnpm-workspace.yaml
 # Go into both newly created folders in packages and run `pnpm init`
@@ -71,7 +71,7 @@ echo -e 'packages:\n  - "packages/*"' > pnpm-workspace.yaml
 <TabItem label="Yarn">
 
 ```sh
-# create a new project with yarn
+# create a new monorepo project with yarn
 yarn init -w ./packages/server
 yarn init -w ./packages/client
 ```
@@ -111,7 +111,7 @@ We'll also be installing a few dependencies from Volar and VS Code. Run the foll
 <TabItem label="npm">
 
 ```sh
-# create a new project with npm
+# Installing dependencies with npm
 npm install @volar/language-server @volar/vscode vscode-languageclient ../server
 ```
 
@@ -119,7 +119,7 @@ npm install @volar/language-server @volar/vscode vscode-languageclient ../server
 <TabItem label="pnpm">
 
 ```sh
-# create a new project with pnpm
+# Installing dependencies with pnpm
 pnpm install @volar/language-server @volar/vscode vscode-languageclient ../server
 ```
 
@@ -127,7 +127,7 @@ pnpm install @volar/language-server @volar/vscode vscode-languageclient ../serve
 <TabItem label="Yarn">
 
 ```sh
-# create a new project with yarn
+# Installing dependencies with yarn
 yarn install @volar/language-server @volar/vscode vscode-languageclient ../server
 ```
 
