@@ -15,7 +15,7 @@ export default defineConfig({
       social: {
         github: "https://github.com/volarjs/",
         twitter: "https://twitter.com/johnsoncodehk",
-        discord: "https://discord.gg/Ha7XJbMJZc",
+        discord: "https://discord.gg/N94ECvy2uW",
       },
       customCss: ["./src/styles/custom.css"],
       editLink: {

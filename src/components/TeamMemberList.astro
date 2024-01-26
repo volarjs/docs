@@ -1,0 +1,33 @@
+---
+import TeamMember from "./TeamMember.astro";
+import johnsonAvatar from "$assets/team/johnson.jpeg";
+import erikaAvatar from "$assets/team/erika.jpeg";
+import remcoAvatar from "$assets/team/remco.jpeg";
+---
+
+<div class="team-members not-content">
+  	<TeamMember name="Johnson Chu" username="johnsoncodehk" avatar={johnsonAvatar}>
+		Johnson is the creator and lead maintainer of Volar.
+	</TeamMember>
+		<TeamMember name="Erika" username="princesseuh" avatar={erikaAvatar}>
+		Erika is a core maintainer on Volar and Astro. She particularly loves focusing on high impact but commonly overlooked work, which is where she found her passion for editor tooling.
+	</TeamMember>
+		<TeamMember name="Remco Haszing" username="remcohaszing" avatar={remcoAvatar}>
+		Remco is a core maintainer on the MDX language server and Volar.
+	</TeamMember>
+</div>
+
+<style>
+  .team-members {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+ @media (max-width: 768px) {
+    .team-members {
+      flex-direction: column;
+    }
+  }
+</style>
