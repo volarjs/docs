@@ -1,4 +1,4 @@
-# volarjs/docs <img align="right" valign="center" height="96" width="96" src="https://volarjs.dev/favicon.svg" alt="VolarJS logo" />
+# volarjs/docs <img align="right" valign="center" height="96" width="96" src="https://github.com/volarjs/docs/assets/57232813/648d2165-3250-4418-a323-ba30eb7b4b7e" alt="VolarJS logo" />
 
 Welcome to the repo for the [VolarJS](https://github.com/volarjs/volar.js) documentation! This repo contains the source code we use to build our site (and of course, its content)
 
