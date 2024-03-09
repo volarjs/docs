@@ -1,0 +1,51 @@
+---
+import BlogMetadata from "$components/BlogMetadata.astro";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { getDataEntryById } from "astro:content";
+import { getCollection } from "astro:content";
+
+const blogCollection = await getCollection("blog");
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Blog",
+    description: "The Volar blog",
+    template: "splash",
+    editUrl: false,
+  }}
+>
+  <article>
+    {
+      blogCollection.map(async (post) => {
+        const authors = await Promise.all(
+          post.data.authors.map(async (author) => {
+            return await getDataEntryById("authors", author.id);
+          }),
+        );
+
+        return (
+          <div>
+            <header>
+              <h2>
+                <a href={"/blog/" + post.slug}>{post.data.title}</a>
+              </h2>
+              <BlogMetadata entry={post} authors={authors} />
+            </header>
+            <p>{post.data.description}</p>
+            <a href={"/blog/" + post.slug} class="text-blue-500">
+              Read more
+            </a>
+          </div>
+        );
+      })
+    }
+  </article>
+</StarlightPage>
+
+<style>
+  article {
+    max-width: 72ch;
+    margin: 0 auto;
+  }
+</style>

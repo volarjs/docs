@@ -11,6 +11,8 @@
   --sl-color-gray-5: #393838;
   --sl-color-gray-6: #272627;
   --sl-color-black: #181818;
+
+  --sl-color-bg-sidebar: #1f1f1f;
 }
 /* Light mode colors. */
 :root[data-theme="light"] {
@@ -26,4 +28,28 @@
   --sl-color-gray-6: #eeeded;
   --sl-color-gray-7: #f6f6f6;
   --sl-color-black: #ffffff;
+}
+
+.site-title {
+  gap: 0.5rem !important;
+  color: var(--sl-color-white);
+}
+
+.site-title:hover {
+  color: var(--sl-color-text-accent);
+}
+
+.card-cnt {
+  margin-top: 7rem !important;
+}
+
+[aria-current="page"],
+[aria-current="page"]:hover,
+[aria-current="page"]:focus {
+  color: var(--sl-color-text-accent) !important;
+  background-color: initial;
+}
+
+:root[data-theme="dark"] mobile-starlight-toc nav {
+  background-color: #1f1f1f;
 }

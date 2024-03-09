@@ -3,62 +3,102 @@ import nuxt from "../assets/sponsors/nuxt.svg?raw";
 import prefect from "../assets/sponsors/prefect.svg?raw";
 import stackblitz from "../assets/sponsors/stackblitz.svg?raw";
 import vue from "../assets/sponsors/vue.svg?raw";
+
+interface Props {
+  smallPadding?: boolean;
+}
+
+const sponsors = [
+  {
+    name: "StackBlitz",
+    img: stackblitz,
+    url: "https://stackblitz.com",
+  },
+  {
+    name: "Nuxt",
+    img: nuxt,
+    url: "https://nuxt.com/",
+  },
+  {
+    name: "Vue",
+    img: vue,
+    url: "https://vuejs.org/",
+  },
+  {
+    name: "Prefect",
+    img: prefect,
+    url: "https://www.prefect.io/",
+  },
+];
+
+const { smallPadding } = Astro.props;
 ---
 
-<hr />
-<section id="sponsors">
-  <h2>Sponsors</h2>
-
-  <a href="https://stackblitz.com">
-    <Fragment set:html={stackblitz} />
-  </a>
-
-  <a href="https://vuejs.org/">
-    <Fragment set:html={vue} />
-  </a>
-
-  <a href="https://nuxt.com/">
-    <Fragment set:html={nuxt} />
-  </a>
-
-  <a href="https://www.prefect.io/">
-    <Fragment set:html={prefect} />
-  </a>
+<section class="not-content" class:list={[{ "small-padding": smallPadding }]}>
+  {
+    sponsors.map((sponsor) => (
+      <a href={sponsor.url}>
+        <article class:list={[{ "small-padding": smallPadding }]}>
+          <h4>{sponsor.name}</h4>
+          <Fragment set:html={sponsor.img} />
+        </article>
+      </a>
+    ))
+  }
 </section>
 
-<hr style="margin-bottom: 5rem;" />
-
 <style>
-  #sponsors {
+  section {
     display: flex;
     flex-wrap: wrap;
-    gap: 4rem;
-    align-content: center;
-    max-height: 42px;
-    color: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    gap: 0.25rem;
+    width: 100%;
+    margin-top: 1rem;
   }
-
-  #sponsors img {
-    margin: 0;
-    height: 42px;
-    width: auto;
-    color: white;
+  section.small-padding a {
+    width: 100%;
   }
-
   a {
-    align-self: center;
+    width: 34%;
+    flex-grow: 1;
   }
-
-  @media screen and (max-width: 1024px) {
-    #sponsors {
-      justify-content: center;
-      max-height: fit-content;
-    }
-
-    #sponsors h2 {
-      width: 100%;
-      text-align: center;
-    }
+  a.large {
+    width: 100%;
+  }
+  article {
+    display: flex;
+    background-color: var(--sl-color-gray-6);
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(100%);
+    transition: background-color 0.2s ease;
+  }
+  article.small-padding {
+    padding: 1.25rem;
+  }
+  article:hover {
+    background-color: var(--sl-color-gray-1);
+    filter: none;
+  }
+  :root[data-theme="dark"] article:hover :global(.sponsor-name) {
+    fill: black;
+  }
+  :root[data-theme="light"] article:hover :global(.sponsor-name) {
+    fill: white;
+  }
+  h4 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    white-space: nowrap;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
   }
 </style>
 

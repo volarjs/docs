@@ -1,0 +1,47 @@
+---
+import BlogMetadata from "$components/BlogMetadata.astro";
+import PageTitleDefault from "@astrojs/starlight/components/PageTitle.astro";
+import type { ComponentProps } from "astro/types";
+import { getDataEntryById } from "astro:content";
+import { getEntryBySlug } from "astro:content";
+type Props = ComponentProps<typeof PageTitleDefault>;
+
+const fullEntry = await getEntryBySlug("blog", Astro.props.slug.split("/")[1]);
+
+let authors;
+if (fullEntry?.data.authors) {
+  authors = await Promise.all(
+    fullEntry.data.authors.map(async (author) => {
+      return await getDataEntryById("authors", author.id);
+    }),
+  );
+}
+---
+
+<header class={Astro.props.entry.data.template + "-title"}>
+  <h1 id={"_top"}>
+    {Astro.props.entry.data.title}
+  </h1>
+
+  {Astro.props.entry.data.description && <h3>{Astro.props.entry.data.description}</h3>}
+  {fullEntry && authors && <BlogMetadata authors={authors} entry={fullEntry} />}
+
+  <style>
+    h1 {
+      margin-top: 1rem;
+      font-size: var(--sl-text-h1);
+      line-height: var(--sl-line-height-headings);
+      font-weight: 600;
+      color: var(--sl-color-white);
+    }
+
+    h3 {
+      margin-top: 0 !important;
+    }
+
+    .splash-title {
+      max-width: 73ch;
+      margin: 0 auto;
+    }
+  </style>
+</header>

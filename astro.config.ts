@@ -1,5 +1,5 @@
 import starlight from "@astrojs/starlight";
-import { defineConfig, sharpImageService } from "astro/config";
+import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
@@ -22,6 +22,11 @@ export default defineConfig({
         baseUrl: "https://github.com/volarjs/docs/edit/main/",
       },
       lastUpdated: true,
+      components: {
+        SiteTitle: "./src/components/starlight/SiteTitle.astro",
+        TableOfContents: "./src/components/starlight/TableOfContents.astro",
+        PageTitle: "./src/components/starlight/PageTitle.astro",
+      },
       sidebar: [
         {
           label: "Core Concepts",
@@ -47,7 +52,4 @@ export default defineConfig({
       ],
     }),
   ],
-
-  // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
-  image: { service: sharpImageService() },
 });

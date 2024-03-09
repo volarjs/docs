@@ -12,17 +12,17 @@ For more information on what Volar itself is, check out [the main repository](ht
 
 Contributions of all size are welcome! If you find a typo, or want to clarify some language, or even want to add a whole new section, no matter what, we're happy to welcome your contributions.
 
-If you can see what the problem is, and you know how to fix it, then definitely feel free to make a PR (pull request) with the change and contribute to this repo yourself. Alternatively, [opening an issue](https://github.com/volarjs/docs/issues/new) and letting us know about the problem is also a totally valid option.
+If you can see what the problem is, and you know how to fix it, then definitely feel free to make a PR (pull request) with the needed changes and contribute to this repo yourself. Alternatively, [opening an issue](https://github.com/volarjs/docs/issues/new) and letting us know about the problem is also a totally valid option.
 
 ### Getting the project running locally
 
-If you want to run VolarJS locally, you can do so by following these steps:
+If you want to run the docs locally, you can do so by following these steps:
 
 1. Clone the repo: `git clone https://github.com/volarjs/docs`
 
-2. Install dependencies: `npm install`
+2. Install dependencies: `pnpm install`
 
-3. Run the site locally: `npm run dev`
+3. Run the site locally: `pnpm run dev`
 
 4. Open the site in your browser: <http://localhost:4321>
 

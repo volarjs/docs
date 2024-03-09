@@ -1,15 +1,10 @@
 ---
-import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
+import type { TeamMember } from "./TeamMemberList.astro";
 
-interface Props {
-  name: string;
-  username: string;
-  avatar: ImageMetadata;
-  githubProfile: string;
-}
+type Props = TeamMember;
 
-const { name, username, avatar, githubProfile } = Astro.props;
+const { name, username, avatar, description, githubProfile } = Astro.props;
 ---
 
 <section class="not-content team-member">
@@ -20,7 +15,7 @@ const { name, username, avatar, githubProfile } = Astro.props;
       <h4>{username}</h4>
     </div>
   </div>
-  <slot />
+  {description}
 </section>
 
 <style>
