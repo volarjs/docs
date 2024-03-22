@@ -23,7 +23,9 @@ function pathsMatch(pathA: string, pathB: string): boolean {
         <a
           href={menuItem.href}
           aria-current={
-            pathsMatch(encodeURI(menuItem.href), Astro.url.pathname) && "page"
+            (pathsMatch(encodeURI(menuItem.href), Astro.url.pathname) ||
+              (menuItem.name === "Docs" && Astro.props.hasSidebar)) &&
+            "page"
           }
         >
           <span>{menuItem.name}</span>
@@ -63,13 +65,12 @@ function pathsMatch(pathA: string, pathB: string): boolean {
     color: var(--sl-color-text-accent);
   }
 
-	@media (min-width: 50rem) {
-		.menu-items {
-			display: flex;
-		}
-		.separator {
-			display: block;
-		}
-	}
-}
+  @media (min-width: 50rem) {
+    .menu-items {
+      display: flex;
+    }
+    .separator {
+      display: block;
+    }
+  }
 </style>

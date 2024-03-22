@@ -53,3 +53,16 @@
 :root[data-theme="dark"] mobile-starlight-toc nav {
   background-color: #1f1f1f;
 }
+
+a {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke,
+    opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+button {
+  transition-property: border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

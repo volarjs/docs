@@ -34,7 +34,7 @@ const sponsors = [
 const { smallPadding } = Astro.props;
 ---
 
-<section class="not-content" class:list={[{ "small-padding": smallPadding }]}>
+<section class="sponsors not-content" class:list={[{ "small-padding": smallPadding }]}>
   {
     sponsors.map((sponsor) => (
       <a href={sponsor.url}>
@@ -46,9 +46,12 @@ const { smallPadding } = Astro.props;
     ))
   }
 </section>
+<section class="not-content sponsor-link-container">
+  <a class="sponsor-link" href="https://github.com/sponsors/johnsoncodehk">💙 Sponsor Volar 💙</a>
+</section>
 
 <style>
-  section {
+  .sponsors {
     display: flex;
     flex-wrap: wrap;
     border-radius: 0.75rem;
@@ -57,14 +60,14 @@ const { smallPadding } = Astro.props;
     width: 100%;
     margin-top: 1rem;
   }
-  section.small-padding a {
+  .sponsors.small-padding a {
     width: 100%;
   }
-  a {
+  .sponsors a {
     width: 34%;
     flex-grow: 1;
   }
-  a.large {
+  .sponsors a.large {
     width: 100%;
   }
   article {
@@ -99,6 +102,18 @@ const { smallPadding } = Astro.props;
     clip: rect(0 0 0 0);
     clip-path: inset(50%);
     overflow: hidden;
+  }
+  .sponsor-link-container {
+    text-align: center;
+  }
+  .sponsor-link {
+    font-size: 1.25rem;
+    text-decoration: none;
+    color: var(--sl-color-text-accent);
+    display: inline !important;
+  }
+  .sponsor-link:hover {
+    color: var(--sl-color-accent);
   }
 </style>
 
