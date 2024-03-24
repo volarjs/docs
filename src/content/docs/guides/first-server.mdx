@@ -2,9 +2,12 @@
 title: Your First Volar Language Server
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+> This page is a work in progress. Interested in contributing some documentation to it, or want to improve it? [Edit this page on GitHub](https://github.com/volarjs/docs/blob/main/src/content/docs/guides/first-server.mdx)
 
-In this guide, we will create a simple Volar language server and VS Code client. To keep things simple, it will look suspiciously like HTML, albeit with one twist: Only one `<style>` tag will be allowed. **We'll call it HTML1.**
+
+import { Tabs, TabItem, Aside, FileTree } from "@astrojs/starlight/components";
+
+In this guide, you will learn create a simple Volar language server and VS Code client. To keep things simple, the language it'll support will look suspiciously like HTML, albeit with one twist: Only one `<style>` tag will be allowed. The language will be called HTML1.
 
 > 💡 Interested in seeing the final product? Check out the [starter project](https://github.com/volarjs/starter) on GitHub.
 
@@ -13,10 +16,11 @@ In this guide, we will create a simple Volar language server and VS Code client.
 - [Visual Studio Code](https://code.visualstudio.com/) version 1.55 or higher.
 - [Node.js](https://nodejs.org/en/) version 14 or higher.
 - Basic knowledge of JavaScript and Node.
+- (Optional) Install the [Volar Labs](https://volarjs.dev/core-concepts/volar-labs/) extension for VS Code.
 
 ## Getting Started
 
-We'll first create a new project directory and initialize a new Node.js project.
+First create a new project directory and initialize a new Node.js project:
 
 <Tabs>
 <TabItem label="npm">
@@ -45,7 +49,7 @@ yarn init .
 </TabItem>
 </Tabs>
 
-In order to be able to have both the language server and the VS Code client in the same repository, [a common pattern for language servers](/guides/file-structure), we'll create a new `packages` directory that will contain both parts, this is effectively known as a monorepo.
+In order to be able to have both the language server and the VS Code client in the same repository, [a common pattern for language servers](/guides/file-structure), create a new `packages` directory that will contain both parts, this is effectively known as a monorepo.
 
 <Tabs>
 <TabItem label="npm">
@@ -78,11 +82,67 @@ yarn init -w ./packages/client
 </TabItem>
 </Tabs>
 
-### The client
+Later in this guide, TypeScript will be used to both write the language server and the client, and to compile the TypeScript code to JavaScript. To make this easier, create a `tsconfig.base.json` file in the root of the project. This file will contain the base configuration for TypeScript, which will be extended by the future `tsconfig.json` files in the `packages/server` and `packages/client` folders.
 
-Since this guide mainly focuses on creating a server we'll start by creating the client so that we can get that out of the way. The client will be a VS Code extension, which necessitate [a `package.json` with a few specific fields](https://code.visualstudio.com/api/references/extension-manifest). As such, update your `package.json` to look like this:
+```json title="tsconfig.base.json"
+{
+	"compilerOptions": {
+		"module": "commonjs",
+    "moduleResolution": "node",
+		"esModuleInterop": true,
+    "skipLibCheck": true,
+	}
+}
+```
 
-```json
+Finally, create a `.vscode` directory in the root of the project, and add a `launch.json` file to it. This file defines [a task](https://code.visualstudio.com/docs/editor/tasks#_typescript-hello-world) that can be used later to easily start your extension locally.
+
+```json title=".vscode/launch.json"
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--disable-updates",
+				"--disable-workspace-trust",
+				"--profile-temp",
+				"--skip-release-notes",
+				"--skip-welcome",
+				"--extensionDevelopmentPath=${workspaceRoot}/packages/vscode"
+			],
+			"outFiles": [
+				"${workspaceRoot}/packages/vscode/dist/*.js"
+			]
+		}
+	],
+}
+```
+
+With all of this done, your project structure should look like this:
+
+<FileTree>
+
+- .vscode/
+	- launch.json
+- packages/
+	- client/
+		- package.json
+	- server/
+		- package.json
+- package.json
+- tsconfig.base.json
+
+</FileTree>
+
+## The client
+
+The client will be a VS Code extension, which necessitate [a `package.json` with a few specific fields](https://code.visualstudio.com/api/references/extension-manifest). In the `packages/client` folder, edit the `package.json` file to look like this:
+
+```json title="packages/client/package.json"
 {
   "name": "client",
   "displayName": "HTML1 Client",
@@ -104,7 +164,7 @@ Since this guide mainly focuses on creating a server we'll start by creating the
 }
 ```
 
-We'll also be installing a few dependencies from Volar and VS Code. Run the following command from the `packages/client` folder to install them:
+Additionally, a few dependencies from Volar and VS Code are needed. Make sure you are in the proper folder (`packages/client`) and install the dependencies by running the following commands:
 
 <Tabs>
 <TabItem label="npm">
@@ -112,6 +172,7 @@ We'll also be installing a few dependencies from Volar and VS Code. Run the foll
 ```sh
 # Installing dependencies with npm
 npm install @volar/language-server @volar/vscode vscode-languageclient ../server
+npm install --save-dev typescript
 ```
 
 </TabItem>
@@ -120,6 +181,7 @@ npm install @volar/language-server @volar/vscode vscode-languageclient ../server
 ```sh
 # Installing dependencies with pnpm
 pnpm install @volar/language-server @volar/vscode vscode-languageclient ../server
+pnpm install --save-dev typescript
 ```
 
 </TabItem>
@@ -127,8 +189,116 @@ pnpm install @volar/language-server @volar/vscode vscode-languageclient ../serve
 
 ```sh
 # Installing dependencies with yarn
-yarn install @volar/language-server @volar/vscode vscode-languageclient ../server
+yarn add @volar/language-server @volar/vscode vscode-languageclient ../server
+yarn add --dev typescript
 ```
 
 </TabItem>
 </Tabs>
+
+Next, create a `tsconfig.json` file in the `packages/client` folder to configure TypeScript, which will be used as a build tool in this guide. This file will tell TypeScript to output the compiled JavaScript files to a `dist` directory. As previously mentioned, this file will extend the base configuration in the `tsconfig.base.json` file that was created earlier at the root of the project.
+
+```jsonc title="packages/client/tsconfig.json"
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"outDir": "out",
+		"rootDir": "src",
+	},
+	"include": [
+		"src",
+	],
+}
+```
+
+Next, create a new `src` directory in the `packages/client` folder, and add a new `extension.ts` file to it. This file will contain the code for the client extension. The vast majority of this code is boilerplate to start the language server, so although it may look like a lot of not very interesting code, it's crucial to the functioning of the extension.
+
+```ts title="packages/client/src/extension.ts"
+import * as serverProtocol from '@volar/language-server/protocol';
+import { activateAutoInsertion, createLabsInfo } from '@volar/vscode';
+import * as vscode from 'vscode';
+import * as lsp from 'vscode-languageclient/node';
+
+let client: lsp.BaseLanguageClient;
+
+// As its name suggests, this function is called when the extension is activated.
+export async function activate(context: vscode.ExtensionContext) {
+	const serverModule = vscode.Uri.joinPath(context.extensionUri, 'node_modules', 'server.js');
+	const serverOptions: lsp.ServerOptions = {
+		run: {
+			module: serverModule.fsPath,
+			transport: lsp.TransportKind.ipc,
+			options: { execArgv: <string[]>[] }
+		},
+		debug: {
+			module: serverModule.fsPath,
+			transport: lsp.TransportKind.ipc,
+			options: { execArgv: ['--nolazy', '--inspect=' + 6009] }
+		},
+	};
+
+	// Options to control the language client, in this case we're only interested
+	// in HTML1 files. Language servers can also accept initialization options, which
+	// are passed to the server when it starts, but we don't have any here.
+	const clientOptions: lsp.LanguageClientOptions = {
+		documentSelector: [{ language: 'html1' }],
+		initializationOptions: {},
+	};
+
+	// Create the language client with all the options we've defined, and start it.
+	client = new lsp.LanguageClient(
+		'html1-language-server',
+		'HTML1 Language Server',
+		serverOptions,
+		clientOptions,
+	);
+	await client.start();
+
+	// Bonus: Add support for auto insertion of closing tags (ex: <div> -> <div></div>)
+	activateAutoInsertion('html1', client);
+
+	// Needed code to add support for Volar Labs
+	// https://volarjs.dev/core-concepts/volar-labs/
+	const labsInfo = createLabsInfo(serverProtocol);
+	labsInfo.addLanguageClient(client);
+	return labsInfo.extensionExports;
+}
+
+// ... and this function is called when the extension is deactivated!
+export function deactivate(): Thenable<any> | undefined {
+	return client?.stop();
+}
+```
+
+<Aside type="note">
+You might notice that the code above imports from `vscode` despite not having it installed. This is because the `vscode` module is provided by VS Code itself, and is available to extensions by default.
+
+For more information on this module and its content, check out the [VS Code API documentation](https://code.visualstudio.com/api/references/vscode-api).
+</Aside>
+
+With this done, the client is now complete. Since the vast majority of the actual logic will be in the language server, it's quite likely that you won't need to revisit the client again much, even as your project grows in complexity.
+
+Your project structure should now look like this:
+
+<FileTree>
+
+- .vscode/
+	- launch.json
+- packages/
+	- client/
+		- src/
+			- extension.ts
+		- package.json
+		- tsconfig.json
+	- server/
+		- package.json
+- package.json
+- tsconfig.base.json
+
+</FileTree>
+
+If you're curious, you can actually start the client right now by running the `Launch Extension` task in VS Code.
+
+Since the server doesn't exist yet, the client will fail to start and immediately crash, but, hey, it's a start!
+
+## The server
