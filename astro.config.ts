@@ -1,4 +1,5 @@
 import starlight from "@astrojs/starlight";
+import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
@@ -9,6 +10,9 @@ export default defineConfig({
       logo: {
         src: "./src/assets/logo.svg",
         alt: "Volar's logo, a light-blue prism with a very subtle tint of red in the top right and a wave going through the prism.",
+      },
+      expressiveCode: {
+        plugins: [pluginCollapsibleSections()],
       },
       title: "Volar.js",
       description: "The Embedded Language Tooling Framework",

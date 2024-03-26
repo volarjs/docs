@@ -8,6 +8,9 @@ dependencies:
   '@astrojs/starlight':
     specifier: ^0.21.2
     version: 0.21.2(astro@4.5.9)
+  '@expressive-code/plugin-collapsible-sections':
+    specifier: ^0.33.5
+    version: 0.33.5
   '@types/hast':
     specifier: ^3.0.4
     version: 3.0.4
@@ -696,6 +699,24 @@ packages:
       hastscript: 7.2.0
       postcss: 8.4.35
       postcss-nested: 6.0.1(postcss@8.4.35)
+    dev: false
+
+  /@expressive-code/core@0.33.5:
+    resolution: {integrity: sha512-KL0EkKAvd7SSIQL3ZIP19xqe4xNjBaQYNvcJC6RmoBUnQpvxaJNFwRxCBEF/X0ftJEMaSG7WTrabZ9c/zFeqmA==}
+    dependencies:
+      '@ctrl/tinycolor': 3.6.1
+      hast-util-to-html: 8.0.4
+      hastscript: 7.2.0
+      postcss: 8.4.35
+      postcss-nested: 6.0.1(postcss@8.4.35)
+    dev: false
+
+  /@expressive-code/plugin-collapsible-sections@0.33.5:
+    resolution: {integrity: sha512-CCudoABDKXx9oDrshEpxN/Vfu3qwUH+JJPjnd/kvEYrLQtL55yp9ZfpEpXED4d2C/iBMhckJdVVYJH5otcmasQ==}
+    dependencies:
+      '@expressive-code/core': 0.33.5
+      hast-util-select: 5.0.5
+      hastscript: 7.2.0
     dev: false
 
   /@expressive-code/plugin-frames@0.33.4:
@@ -1522,6 +1543,10 @@ packages:
       which: 2.0.2
     dev: false
 
+  /css-selector-parser@1.4.1:
+    resolution: {integrity: sha512-HYPSb7y/Z7BNDCOrakL4raGO2zltZkbeXyAd6Tg9obzix6QhzxCotdBl6VT0Dv4vZfJGVz3WL/xaEI9Ly3ul0g==}
+    dev: false
+
   /css-selector-parser@3.0.4:
     resolution: {integrity: sha512-pnmS1dbKsz6KA4EW4BznyPL2xxkNDRg62hcD0v8g6DEw2W7hxOln5M953jsp9hmw5Dg57S6o/A8GOn37mbAgcQ==}
     dev: false
@@ -1949,6 +1974,10 @@ packages:
       web-namespaces: 2.0.1
     dev: false
 
+  /hast-util-has-property@2.0.1:
+    resolution: {integrity: sha512-X2+RwZIMTMKpXUzlotatPzWj8bspCymtXH3cfG3iQKV+wPF53Vgaqxi/eLqGck0wKq1kS9nvoB1wchbCPEL8sg==}
+    dev: false
+
   /hast-util-has-property@3.0.0:
     resolution: {integrity: sha512-MNilsvEKLFpV604hwfhVStK0usFY/QmM5zX16bo7EjnAEGofr5YyI37kzopBlZJkHD4t887i+q/C8/tr5Q94cA==}
     dependencies:
@@ -2004,6 +2033,26 @@ packages:
       unist-util-visit: 5.0.0
       vfile: 6.0.1
       web-namespaces: 2.0.1
+      zwitch: 2.0.4
+    dev: false
+
+  /hast-util-select@5.0.5:
+    resolution: {integrity: sha512-QQhWMhgTFRhCaQdgTKzZ5g31GLQ9qRb1hZtDPMqQaOhpLBziWcshUS0uCR5IJ0U1jrK/mxg35fmcq+Dp/Cy2Aw==}
+    dependencies:
+      '@types/hast': 2.3.6
+      '@types/unist': 2.0.8
+      bcp-47-match: 2.0.3
+      comma-separated-tokens: 2.0.3
+      css-selector-parser: 1.4.1
+      direction: 2.0.1
+      hast-util-has-property: 2.0.1
+      hast-util-to-string: 2.0.0
+      hast-util-whitespace: 2.0.1
+      not: 0.1.0
+      nth-check: 2.1.1
+      property-information: 6.3.0
+      space-separated-tokens: 2.0.2
+      unist-util-visit: 4.1.2
       zwitch: 2.0.4
     dev: false
 
@@ -2127,6 +2176,12 @@ packages:
       space-separated-tokens: 2.0.2
       web-namespaces: 2.0.1
       zwitch: 2.0.4
+    dev: false
+
+  /hast-util-to-string@2.0.0:
+    resolution: {integrity: sha512-02AQ3vLhuH3FisaMM+i/9sm4OXGSq1UhOOCpTLLQtHdL3tZt7qil69r8M8iDkZYyC0HCFylcYoP+8IO7ddta1A==}
+    dependencies:
+      '@types/hast': 2.3.6
     dev: false
 
   /hast-util-to-string@3.0.0:
