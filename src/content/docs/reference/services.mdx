@@ -81,16 +81,21 @@ export const service = {
 	create(context): ServicePluginInstance {
 		return {
 			provideCompletionItems(document, position, token) {
-				return [
-					{
-						label: 'Hello',
-						kind: CompletionItemKind.Text,
-					},
-					{
-						label: 'World',
-						kind: CompletionItemKind.Text,
-					},
-				];
+				return {
+					isIncomplete: true,
+					items: [
+						{
+							label: 'Hello',
+							kind: CompletionItemKind.Text,
+							isIncomplete: false
+						},
+						{
+							label: 'World',
+							kind: CompletionItemKind.Text,
+							isIncomplete: false
+						},
+					]
+				}
 			},
 		};
 	},
