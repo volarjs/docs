@@ -4,10 +4,11 @@ title: Your First Volar Language Server
 
 > This page is a work in progress. Interested in contributing some documentation to it, or want to improve it? [Edit this page on GitHub](https://github.com/volarjs/docs/blob/main/src/content/docs/guides/first-server.mdx)
 
-
 import { Tabs, TabItem, Aside, FileTree } from "@astrojs/starlight/components";
 
 In this guide, you will learn create a simple Volar language server and VS Code client. To keep things simple, the language it'll support will look suspiciously like HTML, albeit with one twist: Only one `<style>` tag will be allowed. The language will be called HTML1.
+
+This guide assumes that you have a basic understanding of TypeScript and Node.js, and also of what a language server is. If you're not familiar with language servers, you might want to read the "What is the Language Server Protocol?" section of the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) homepage before continuing.
 
 > 💡 Interested in seeing the final product? Check out the [starter project](https://github.com/volarjs/starter) on GitHub.
 
@@ -82,40 +83,78 @@ yarn init -w ./packages/client
 </TabItem>
 </Tabs>
 
-Later in this guide, TypeScript will be used to both write the language server and the client, and to compile the TypeScript code to JavaScript. To make this easier, create a `tsconfig.base.json` file in the root of the project. This file will contain the base configuration for TypeScript, which will be extended by the future `tsconfig.json` files in the `packages/server` and `packages/client` folders.
+<Aside type="note">
+When asked for the package name, this guide assume that you'll name the client `vscode-html1` and the server `@html1/language-server`.
+
+Feel free to name them whatever you like, but make sure to adjust the rest of the guide accordingly.
+
+</Aside>
+
+### Installing and configuring TypeScript
+
+Later in this guide, TypeScript will be used to both write the language server and the client, and to compile the TypeScript code to JavaScript, so we'll install it now.
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# Installing TypeScript with npm
+npm install --save-dev typescript
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# Installing TypeScript with pnpmf
+pnpm add --save-dev typescript
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# Installing TypeScript with yarn
+yarn add --dev typescript
+```
+
+</TabItem>
+</Tabs>
+
+Additionally, we'll create a base TypeScript configuration file that will be shared between the server and the client. This file will be used to set up the TypeScript compiler options that are common to both parts of the project.
 
 ```json title="tsconfig.base.json"
 {
-	"compilerOptions": {
-		"module": "nodenext",
-	}
+  "compilerOptions": {
+    "module": "nodenext"
+  }
 }
 ```
+
+### Defining VS Code tasks
 
 Finally, create a `.vscode` directory in the root of the project, and add a `launch.json` file to it. This file defines [a task](https://code.visualstudio.com/docs/editor/tasks#_typescript-hello-world) that can be used later to easily start your extension locally.
 
 ```json title=".vscode/launch.json"
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Launch Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--disable-updates",
-				"--disable-workspace-trust",
-				"--profile-temp",
-				"--skip-release-notes",
-				"--skip-welcome",
-				"--extensionDevelopmentPath=${workspaceRoot}/packages/vscode"
-			],
-			"outFiles": [
-				"${workspaceRoot}/packages/vscode/dist/*.js"
-			]
-		}
-	],
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-updates",
+        "--disable-workspace-trust",
+        "--profile-temp",
+        "--skip-release-notes",
+        "--skip-welcome",
+        "--extensionDevelopmentPath=${workspaceRoot}/packages/vscode"
+      ],
+      "outFiles": ["${workspaceRoot}/packages/vscode/dist/*.js"]
+    }
+  ]
 }
 ```
 
@@ -124,12 +163,12 @@ With all of this done, your project structure should look like this:
 <FileTree>
 
 - .vscode/
-	- launch.json
+  - launch.json
 - packages/
-	- client/
-		- package.json
-	- server/
-		- package.json
+  - client/
+    - package.json
+  - server/
+    - package.json
 - package.json
 - tsconfig.base.json
 
@@ -141,7 +180,7 @@ The client will be a VS Code extension, which necessitate [a `package.json` with
 
 ```json title="packages/client/package.json"
 {
-  "name": "client",
+  "name": "vscode-html1",
   "displayName": "HTML1 Client",
   "description": "A VS Code extension for HTML1.",
   "version": "0.0.1",
@@ -168,8 +207,7 @@ Additionally, a few dependencies from Volar and VS Code are needed. Make sure yo
 
 ```sh
 # Installing dependencies with npm
-npm install @volar/language-server @volar/vscode vscode-languageclient ../server
-npm install --save-dev typescript
+npm install @volar/language-server @volar/vscode vscode-languageclient @types/vscode ../server
 ```
 
 </TabItem>
@@ -177,8 +215,7 @@ npm install --save-dev typescript
 
 ```sh
 # Installing dependencies with pnpm
-pnpm install @volar/language-server @volar/vscode vscode-languageclient ../server
-pnpm install --save-dev typescript
+pnpm install @volar/language-server @volar/vscode vscode-languageclient @types/vscode ../server
 ```
 
 </TabItem>
@@ -186,84 +223,91 @@ pnpm install --save-dev typescript
 
 ```sh
 # Installing dependencies with yarn
-yarn add @volar/language-server @volar/vscode vscode-languageclient ../server
-yarn add --dev typescript
+yarn add @volar/language-server @volar/vscode vscode-languageclient @types/vscode ../server
 ```
 
 </TabItem>
 </Tabs>
 
-Next, create a `tsconfig.json` file in the `packages/client` folder to configure TypeScript, which will be used as a build tool in this guide. This file will tell TypeScript to output the compiled JavaScript files to a `dist` directory. As previously mentioned, this file will extend the base configuration in the `tsconfig.base.json` file that was created earlier at the root of the project.
+Next, create a `tsconfig.json` file in the `packages/client` folder to configure TypeScript, which will be used as a build tool in this guide. This file will tell TypeScript to output the compiled JavaScript files to a `dist` directory.
+
+As previously mentioned, this file will extend the base configuration in the `tsconfig.base.json` file that was created earlier at the root of the project.
 
 ```jsonc title="packages/client/tsconfig.json"
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"outDir": "out",
-		"rootDir": "src",
-	},
-	"include": [
-		"src",
-	],
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out",
+    "rootDir": "src",
+  },
+  "include": ["src"],
 }
 ```
 
-Next, create a new `src` directory in the `packages/client` folder, and add a new `extension.ts` file to it. This file will contain the code for the client extension. The vast majority of this code is boilerplate to start the language server, so although it may look like a lot of not very interesting code, it's crucial to the functioning of the extension.
+Next, create a new `src` directory in the `packages/client` folder, and add a new `extension.ts` file to it. This file will contain the code for the client extension.
+
+The vast majority of this code is boilerplate to start the language server, so although it may look like a lot of not very interesting code, it's crucial to the functioning of the extension.
 
 ```ts title="packages/client/src/extension.ts"
-import * as serverProtocol from '@volar/language-server/protocol';
-import { activateAutoInsertion, createLabsInfo } from '@volar/vscode';
-import * as vscode from 'vscode';
-import * as lsp from 'vscode-languageclient/node';
+import * as serverProtocol from "@volar/language-server/protocol";
+import { activateAutoInsertion, createLabsInfo } from "@volar/vscode";
+import * as vscode from "vscode";
+import * as lsp from "vscode-languageclient/node";
 
 let client: lsp.BaseLanguageClient;
 
 // As its name suggests, this function is called when the extension is activated.
 export async function activate(context: vscode.ExtensionContext) {
-	const serverModule = vscode.Uri.joinPath(context.extensionUri, 'node_modules', 'server.js');
-	const serverOptions: lsp.ServerOptions = {
-		run: {
-			module: serverModule.fsPath,
-			transport: lsp.TransportKind.ipc,
-			options: { execArgv: <string[]>[] }
-		},
-		debug: {
-			module: serverModule.fsPath,
-			transport: lsp.TransportKind.ipc,
-			options: { execArgv: ['--nolazy', '--inspect=' + 6009] }
-		},
-	};
+  const serverModule = vscode.Uri.joinPath(
+    context.extensionUri,
+    "node_modules",
+    "@html1/language-server",
+    "dist",
+    "server.js",
+  );
+  const serverOptions: lsp.ServerOptions = {
+    run: {
+      module: serverModule.fsPath,
+      transport: lsp.TransportKind.ipc,
+      options: { execArgv: <string[]>[] },
+    },
+    debug: {
+      module: serverModule.fsPath,
+      transport: lsp.TransportKind.ipc,
+      options: { execArgv: ["--nolazy", "--inspect=" + 6009] },
+    },
+  };
 
-	// Options to control the language client, in this case we're only interested
-	// in HTML1 files. Language servers can also accept initialization options, which
-	// are passed to the server when it starts, but we don't have any here.
-	const clientOptions: lsp.LanguageClientOptions = {
-		documentSelector: [{ language: 'html1' }],
-		initializationOptions: {},
-	};
+  // Options to control the language client, in this case we're only interested
+  // in HTML1 files. Language servers can also accept initialization options, which
+  // are passed to the server when it starts, but we don't have any here.
+  const clientOptions: lsp.LanguageClientOptions = {
+    documentSelector: [{ language: "html1" }],
+    initializationOptions: {},
+  };
 
-	// Create the language client with all the options we've defined, and start it.
-	client = new lsp.LanguageClient(
-		'html1-language-server',
-		'HTML1 Language Server',
-		serverOptions,
-		clientOptions,
-	);
-	await client.start();
+  // Create the language client with all the options we've defined, and start it.
+  client = new lsp.LanguageClient(
+    "html1-language-server",
+    "HTML1 Language Server",
+    serverOptions,
+    clientOptions,
+  );
+  await client.start();
 
-	// Bonus: Add support for auto insertion of closing tags (ex: <div> -> <div></div>)
-	activateAutoInsertion('html1', client);
+  // Bonus: Add support for auto insertion of closing tags (ex: <div> -> <div></div>)
+  activateAutoInsertion("html1", client);
 
-	// Needed code to add support for Volar Labs
-	// https://volarjs.dev/core-concepts/volar-labs/
-	const labsInfo = createLabsInfo(serverProtocol);
-	labsInfo.addLanguageClient(client);
-	return labsInfo.extensionExports;
+  // Needed code to add support for Volar Labs
+  // https://volarjs.dev/core-concepts/volar-labs/
+  const labsInfo = createLabsInfo(serverProtocol);
+  labsInfo.addLanguageClient(client);
+  return labsInfo.extensionExports;
 }
 
 // ... and this function is called when the extension is deactivated!
 export function deactivate(): Thenable<any> | undefined {
-	return client?.stop();
+  return client?.stop();
 }
 ```
 
@@ -271,6 +315,7 @@ export function deactivate(): Thenable<any> | undefined {
 You might notice that the code above imports from `vscode` despite not having it installed. This is because the `vscode` module is provided by VS Code itself, and is available to extensions by default.
 
 For more information on this module and its content, check out the [VS Code API documentation](https://code.visualstudio.com/api/references/vscode-api).
+
 </Aside>
 
 With this done, the client is now complete. Since the vast majority of the actual logic will be in the language server, it's quite likely that you won't need to revisit the client again much, even as your project grows in complexity.
@@ -280,15 +325,15 @@ Your project structure should now look like this:
 <FileTree>
 
 - .vscode/
-	- launch.json
+  - launch.json
 - packages/
-	- client/
-		- src/
-			- extension.ts
-		- package.json
-		- tsconfig.json
-	- server/
-		- package.json
+  - client/
+    - src/
+      - extension.ts
+    - package.json
+    - tsconfig.json
+  - server/
+    - package.json
 - package.json
 - tsconfig.base.json
 
@@ -300,4 +345,217 @@ Since the server doesn't exist yet, the client will fail to start and immediatel
 
 ## The server
 
-... to be continued.
+Now onto the meat of the project: the language server. Most of this section will be spent on hooking things up more so than writing actual logic. The actual logic will be quite simple, as the language we're supporting is quite simple.
+
+First, we'll be installing a few dependencies, just like we did for the client. Make sure you're in the proper folder (`packages/server`) and run the following commands:
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# Installing dependencies with npm
+npm install @volar/language-server @volar/language-core @volar/language-service volar-service-html volar-service-css vscode-html-languageservice
+```
+
+</TabItem>
+
+<TabItem label="pnpm">
+
+```sh
+# Installing dependencies with pnpm
+pnpm install @volar/language-server @volar/language-core @volar/language-service volar-service-html volar-service-css vscode-html-languageservice
+```
+
+</TabItem>
+
+<TabItem label="Yarn">
+
+```sh
+# Installing dependencies with yarn
+yarn add @volar/language-server @volar/language-core @volar/language-service volar-service-html volar-service-css vscode-html-languageservice
+```
+
+</TabItem>
+</Tabs>
+
+Again, just like with the client, create a `tsconfig.json` file in the `packages/server` folder to configure TypeScript. This file will tell TypeScript to output the compiled JavaScript files to a `dist` directory.
+
+```jsonc title="packages/server/tsconfig.json"
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out",
+    "rootDir": "src",
+  },
+  "include": ["src"],
+}
+```
+
+Since language servers are executable programs, we need to create an entry point for the server. Create a new `bin` directory in the `packages/server` folder, and add a file called `html1-language-server.js` to it.
+
+This file will contain a very small snippet of code that will start the language server.
+
+```ts title="packages/server/bin/html1-language-server.js"
+#!/usr/bin/env node
+if (process.argv.includes("--version")) {
+  const pkgJSON = require("../package.json");
+  console.log(`${pkgJSON["version"]}`);
+} else {
+  require("../out/index.js");
+}
+```
+
+We'll also update our `package.json` file in the `packages/server` folder to add this file [as an executable](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#bin) the package provides.
+
+```jsonc title="packages/server/package.json" ins={4-6}
+{
+  "name": "@html1/language-server",
+  "version": "0.0.1",
+  "bin": {
+    "html1-language-server": "./bin/html1-language-server.js",
+  },
+  "dependencies": {
+    // All your dependencies here...
+  },
+}
+```
+
+Now, people who install your package will be able to run the server using the `html1-language-server` command. As a bonus, they can also check the version of the server by running `html1-language-server --version`.
+
+However, we still have no server to actually start! Create a new `src` directory in the `packages/server` folder, and create the three following files:
+
+- `index.ts`: The entry point for the server, this file will create, configure and start the server.
+- `html1-service.ts`: The [service](/reference/services/) that will handle the HTML1 language.
+- `languagePlugin.ts`: The [language definition](/reference/languages/) for the HTML1 language.
+
+At this point, your entire project structure should look like this:
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+- packages/
+  - client/
+    - src/
+      - extension.ts
+    - package.json
+    - tsconfig.json
+  - server/
+    - bin/
+      - html1-language-server.js
+    - src/
+      - index.ts
+      - html1-service.ts
+      - languagePlugin.ts
+    - package.json
+    - tsconfig.json
+- package.json
+- tsconfig.base.json
+
+</FileTree>
+
+### Server configuration
+
+We'll first jump into the `index.ts` file. This file will create the server, configuring all the languages supported and the different services that will be used and then start the server.
+
+```ts title="packages/server/src/index.ts"
+import { html1LanguagePlugin, Html1Code } from "./languagePlugin";
+import { create as createHtmlService } from "volar-service-html";
+import { create as createCssService } from "volar-service-css";
+import {
+  createServer,
+  createConnection,
+  ServerProjectProviderFactory,
+} from "@volar/language-server/node";
+
+const connection = createConnection();
+const server = createServer(connection);
+
+connection.listen();
+
+connection.onInitialize((params) => {
+  return server.initialize(params, ServerProjectProviderFactory(), {
+    getLanguagePlugins() {
+      return [
+        // Empty for now
+      ];
+    },
+    getServicePlugins() {
+      return [createHtmlService(), createCssService()];
+    },
+  });
+});
+
+connection.onInitialized(server.initialized);
+connection.onShutdown(server.shutdown);
+```
+
+To go over this file a little bit, we first create a connection (`createConnection`), then create the server itself. We then listen to the connection, waiting for the client to connect.
+
+Once the connection is done, we initialize the server, including its language and service plugins. In our case, we don't have any language plugins yet, but we do have two service plugins: one for HTML and one for CSS, both languages that our HTML1 language will support.
+
+### Defining the language
+
+As can be expected from a language server framework, we need to define the language we're supporting. In our case, this is HTML1. As a reminder, HTML1 is HTML with the restriction that only one `<style>` tag is allowed (also, it doesn't have `script` tags, but we'll ignore that for now).
+
+A language definition, as its core, is simply a JavaScript object with two methods: one to create a virtual code and one to update it. A virtual code (`VirtualCode`) is an object that represents a file in the language server, and is used to store information about the file, such as its content, its current version and any other metadata that might be useful.
+
+Every file that the language server will handle will have a corresponding `VirtualCode` object. The language server will create these objects when a file is opened, and update them when the file is changed.
+
+```ts
+import type { LanguagePlugin } from "@volar/language-core";
+
+export const language = {
+  createVirtualCode(fileId, languageId, snapshot) {
+    // Create a virtual code object
+  },
+  updateVirtualCode(_fileId, languageCode, snapshot) {
+    // Update the virtual code object
+  },
+} satisfies LanguagePlugin;
+```
+
+While `VirtualCode` objects can be, well, just that, objects, it's often useful to create a JavaScript class to represent them. This class can then contain methods and properties that are useful for handling the file and its associated data.
+
+```ts title="packages/server/src/languagePlugin.ts" ins={5-7, 10-11, 15-99} ins=/(VirtualCode) }/
+import type { LanguagePlugin, VirtualCode } from "@volar/language-core";
+
+export const language = {
+  createVirtualCode(fileId, languageId, snapshot) {
+    if (languageId === "html1") {
+      return new Html1Code(fileId, languageId, snapshot);
+    }
+  },
+  updateVirtualCode(_fileId, languageCode, snapshot) {
+    languageCode.update(snapshot);
+    return languageCode;
+  },
+} satisfies LanguagePlugin;
+
+export class Html1Code implements VirtualCode {
+  id = "root";
+  languageId = "html1";
+  embeddedCodes: VirtualCode[] = [];
+
+  constructor(public snapshot: ts.IScriptSnapshot) {
+    this.onSnapshotUpdated();
+  }
+
+  public update(newSnapshot: ts.IScriptSnapshot) {
+    this.snapshot = newSnapshot;
+    this.onSnapshotUpdated();
+  }
+
+  public onSnapshotUpdated() {
+    // Do something with the snapshot
+  }
+}
+```
+
+The (second-to) last piece of the puzzle is the `onSnapshotUpdated` method. This method will contain all the logic that will be executed when the file is updated. In our case, we'll use this method to parse the file and understand its structure and content.
+
+You might have noticed that the `Html1Code` class has an `embeddedCodes` property. This property is used to store any embedded VirtualCode(s) for [the embedded languages](/core-concepts/embedded-languages) that the file might contain.
+
+In our case, HTML1 will contain two embedded languages: HTML and CSS. To find where these embedded languages are, we'll need to parse the file and look for the `<style>` tag. When we find it, we'll create a new `VirtualCode` object for the HTML and CSS code and add it to the `embeddedCodes` array.
+
+We'll be using the `vscode-html-languageservice` package to parse the HTML and CSS code, this package is also used by the HTML service that we previously added to the server.
