@@ -465,7 +465,7 @@ import { create as createCssService } from "volar-service-css";
 import {
   createServer,
   createConnection,
-  ServerProjectProviderFactory,
+  createSimpleProject,
 } from "@volar/language-server/node";
 
 const connection = createConnection();
@@ -474,16 +474,16 @@ const server = createServer(connection);
 connection.listen();
 
 connection.onInitialize((params) => {
-  return server.initialize(params, ServerProjectProviderFactory(), {
-    getLanguagePlugins() {
-      return [
-        // Empty for now
-      ];
-    },
-    getServicePlugins() {
-      return [createHtmlService(), createCssService()];
-    },
-  });
+  return server.initialize(
+    params,
+    createSimpleProject([
+      // Language plugins, empty for now
+    ]),
+    [
+      createHtmlService(),
+      createCssService(),
+    ],
+  );
 });
 
 connection.onInitialized(server.initialized);
@@ -504,33 +504,46 @@ Every file that the language server will handle will have a corresponding `Virtu
 
 ```ts
 import type { LanguagePlugin } from "@volar/language-core";
+import type { URI } from "vscode-uri";
 
 export const language = {
-  createVirtualCode(fileId, languageId, snapshot) {
+  getLanguageId(uri) {
+    if (uri.path.endsWith('.html1')) {
+      return 'html1';
+    }
+  },
+  createVirtualCode(uri, languageId, snapshot) {
     // Create a virtual code object
   },
-  updateVirtualCode(_fileId, languageCode, snapshot) {
+  updateVirtualCode(uri, languageCode, snapshot) {
     // Update the virtual code object
   },
-} satisfies LanguagePlugin;
+} satisfies LanguagePlugin<URI>;
 ```
 
 While `VirtualCode` objects can be, well, just that, objects, it's often useful to create a JavaScript class to represent them. This class can then contain methods and properties that are useful for handling the file and its associated data.
 
-```ts title="packages/server/src/languagePlugin.ts" ins={5-7, 10-11, 15-99} ins=/(VirtualCode) }/
+```ts title="packages/server/src/languagePlugin.ts" ins={3, 12-14, 17-18, 22-99} ins=/(VirtualCode) }/
 import type { LanguagePlugin, VirtualCode } from "@volar/language-core";
+import type { URI } from "vscode-uri";
+import type * as ts from 'typescript';
 
 export const language = {
-  createVirtualCode(fileId, languageId, snapshot) {
-    if (languageId === "html1") {
-      return new Html1Code(fileId, languageId, snapshot);
+  getLanguageId(uri) {
+    if (uri.path.endsWith('.html1')) {
+      return 'html1';
     }
   },
-  updateVirtualCode(_fileId, languageCode, snapshot) {
+  createVirtualCode(uri, languageId, snapshot) {
+    if (languageId === "html1") {
+      return new Html1Code(snapshot);
+    }
+  },
+  updateVirtualCode(uri, languageCode, snapshot) {
     languageCode.update(snapshot);
     return languageCode;
   },
-} satisfies LanguagePlugin;
+} satisfies LanguagePlugin<URI>;
 
 export class Html1Code implements VirtualCode {
   id = "root";
