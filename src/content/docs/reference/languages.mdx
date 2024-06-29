@@ -1,0 +1,126 @@
+---
+title: Languages
+---
+
+> This page is a work in progress. Interested in contributing some documentation to it, or want to improve it? [Edit this page on GitHub](https://github.com/volarjs/docs/blob/main/src/content/docs/reference/languages.mdx)
+
+As can be expected from a framework for language servers, Volar allows you to define the languages you want to support in your project.
+
+## Shape of a language definition
+
+A language definition is a JavaScript object that contains a `createVirtualCode` and a `updateVirtualCode` function.
+
+```ts title="src/my-language.ts"
+export const language = {
+	createVirtualCode(fileId, languageId, snapshot) {
+		// Create a virtual code object
+	},
+	updateVirtualCode(_fileId, languageCode, snapshot) {
+		// Update the virtual code object
+	},
+};
+```
+
+As the names suggests, those methods create and update a `VirtualCode`. A `VirtualCode` object is created for each file that your language server will handle. These can then be accessed in the hooks of the [services](/reference/services) that provides the features of your language server, as such they're also a place you can store additional information about the file that could be useful to know for the features of your services.
+
+Albeit not required, a common pattern is to define a JavaScript class that implements the `VirtualCode` interface, as this makes it easier to later add more properties and methods to the virtual code object and unlock the ability to use `instanceof` to check if a virtual code object is of a certain type.
+
+```ts title="src/my-language.ts"
+import type { LanguagePlugin, VirtualCode } from '@volar/language-core';
+
+export const language = {
+	createVirtualCode(fileId, languageId, snapshot) {
+		if (languageId !== 'my-language')
+			return;
+
+		return new MyLanguageVirtualCode(snapshot);
+	},
+	updateVirtualCode(_fileId, languageCode, snapshot) {
+		languageCode.update(snapshot);
+		return languageCode;
+	},
+} satisfies LanguagePlugin<MyLanguageVirtualCode>;
+
+export class MyLanguageVirtualCode implements VirtualCode {
+	id = 'root';
+	languageId = 'my-language';
+	mappings = []
+
+	constructor(
+		public snapshot: ts.IScriptSnapshot
+	) {
+		this.onSnapshotUpdated();
+	}
+
+	public update(newSnapshot: ts.IScriptSnapshot) {
+		this.snapshot = newSnapshot;
+		this.onSnapshotUpdated();
+	}
+
+	onSnapshotUpdated() {
+		// Update the virtual code object
+	}
+}
+```
+
+This is a simple example of a language definition, where `MyVirtualLanguageCode` only does the strict minimum possible. In a real language definition, you would most likely have a lot more properties and methods available on the `MyLanguageVirtualCode` class.
+
+### Embedded languages
+
+If your language supports [embedded languages](/core-concepts/embedded-languages/), your instance `VirtualCode` should include a `embeddedCodes` property that contains an array of `VirtualCode` instances for the embedded languages.
+
+```ts title="src/my-language.ts" ins={20, 34-52} collapse={1-14, 22-31}
+import type { LanguagePlugin, VirtualCode } from '@volar/language-core';
+
+export const language = {
+	createVirtualCode(fileId, languageId, snapshot) {
+		if (languageId !== 'my-language')
+			return;
+
+		return new MyLanguageVirtualCode(snapshot);
+	},
+	updateVirtualCode(_fileId, languageCode, snapshot) {
+		languageCode.update(snapshot);
+		return languageCode;
+	},
+} satisfies LanguagePlugin<MyLanguageVirtualCode>;
+
+export class MyLanguageVirtualCode implements VirtualCode {
+	id = 'root';
+	languageId = 'my-language';
+	mappings = []
+	embeddedCodes: VirtualCode[] = []
+
+	constructor(
+		public snapshot: ts.IScriptSnapshot
+	) {
+		this.onSnapshotUpdated();
+	}
+
+	public update(newSnapshot: ts.IScriptSnapshot) {
+		this.snapshot = newSnapshot;
+		this.onSnapshotUpdated();
+	}
+
+	onSnapshotUpdated() {
+		const snapshotContent = this.snapshot.getText(0, this.snapshot.getLength());
+
+		// Find embedded languages
+		const embeddedLanguages = findEmbeddedLanguages(snapshotContent);
+
+		// Create virtual code objects for embedded languages
+		this.embeddedCodes = embeddedLanguages.map(embeddedLanguage => {
+			return {
+				id: embeddedLanguage.id,
+				languageId: embeddedLanguage.languageId,
+				mappings: [],
+				snapshot: {
+						getText: (start, end) => embeddedLanguage.content.substring(start, end),
+						getLength: () => embeddedLanguage.content.length,
+						getChangeRange: () => undefined,
+					}
+			}
+		});
+	}
+}
+```

@@ -1,53 +1,130 @@
 ---
-import { Image } from "astro:assets";
-import nuxt from "../assets/sponsors/nuxt.svg";
-import prefect from "../assets/sponsors/prefect.svg";
-import stackblitz from "../assets/sponsors/stackblitz.svg";
-import vue from "../assets/sponsors/vue.svg";
+import astro from "../assets/sponsors/astro.svg?raw";
+import prefect from "../assets/sponsors/prefect.svg?raw";
+import stackblitz from "../assets/sponsors/stackblitz.svg?raw";
+import vue from "../assets/sponsors/vue.svg?raw";
+import jetbrains from "../assets/sponsors/jetbrains.svg?raw";
+
+interface Props {
+  smallPadding?: boolean;
+}
+
+const sponsors = [
+  {
+    name: "StackBlitz",
+    img: stackblitz,
+    url: "https://stackblitz.com",
+  },
+  {
+    name: "JetBrains",
+    img: jetbrains,
+    url: "https://www.jetbrains.com/",
+  },
+  {
+    name: "Astro",
+    img: astro,
+    url: "https://astro.build",
+  },
+  {
+    name: "Vue",
+    img: vue,
+    url: "https://vuejs.org/",
+  },
+  {
+    name: "Prefect",
+    img: prefect,
+    url: "https://www.prefect.io/",
+  },
+];
+
+const { smallPadding } = Astro.props;
 ---
 
-<hr />
-<section id="sponsors">
-  <h2>Sponsors</h2>
-
-  <a href="https://stackblitz.com"><Image src={stackblitz} alt="StackBlitz's logo" /></a>
-
-  <a href="https://vuejs.org/"><Image src={vue} alt="Vue's logo" /></a>
-
-  <a href="https://nuxt.com/"><Image src={nuxt} alt="Nuxt's logo" /></a>
-
-  <a href="https://www.prefect.io/"
-    ><Image src={prefect} alt="Prefect's Logo" style="width: 196px;" /></a
-  >
+<section class="sponsors not-content" class:list={[{ "small-padding": smallPadding }]}>
+  {
+    sponsors.map((sponsor) => (
+      <a href={sponsor.url}>
+        <article class:list={[{ "small-padding": smallPadding }]}>
+          <h4>{sponsor.name}</h4>
+          <Fragment set:html={sponsor.img} />
+        </article>
+      </a>
+    ))
+  }
+</section>
+<section class="not-content cta-github-container">
+  <a class="cta-github" href="https://github.com/sponsors/johnsoncodehk">💙 Sponsor Volar 💙</a>
 </section>
 
-<hr style="margin-bottom: 5rem;" />
-
 <style>
-  #sponsors {
+  .sponsors {
     display: flex;
     flex-wrap: wrap;
-    gap: 4rem;
-    align-content: center;
-    max-height: 42px;
-    color: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    gap: 0.25rem;
+    width: 100%;
+    margin-top: 1rem;
   }
-
-  #sponsors img {
-    margin: 0;
-    height: 42px;
-    width: auto;
-    color: white;
+  .sponsors.small-padding a {
+    width: 100%;
   }
-
-  a {
-    align-self: center;
+  .sponsors a {
+    width: 34%;
+    flex-grow: 1;
   }
+  .sponsors a.large {
+    width: 100%;
+  }
+  article {
+    display: flex;
+    background-color: var(--sl-color-gray-6);
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(100%);
+    transition: background-color 0.2s ease;
+  }
+  article.small-padding {
+    padding: 1.25rem;
+  }
+  article:hover {
+    background-color: var(--sl-color-gray-1);
+    filter: none;
+  }
+  :root[data-theme="dark"] article:hover :global(.sponsor-name) {
+    fill: black;
+  }
+  :root[data-theme="light"] article:hover :global(.sponsor-name) {
+    fill: white;
+  }
+  h4 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    white-space: nowrap;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .cta-github-container {
+    text-align: center;
+  }
+  .cta-github {
+    font-size: 1.25rem;
+    text-decoration: none;
+    color: var(--sl-color-text-accent);
+    display: inline !important;
+  }
+  .cta-github:hover {
+    color: var(--sl-color-accent);
+  }
+</style>
 
-  @media screen and (max-width: 50em) {
-    #sponsors {
-      justify-content: center;
-      max-height: fit-content;
-    }
+<style is:global>
+  :root[data-theme="light"] .sponsor-name {
+    fill: black;
   }
 </style>

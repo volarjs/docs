@@ -21,24 +21,34 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
 import Sponsors from "$components/Sponsors.astro";
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import TeamMemberList from "$components/TeamMemberList.astro";
+import ModifyHeader from "$components/ModifyHeader.astro";
+
+<ModifyHeader />
+
+## Sponsors
 
 <Sponsors />
 
-<CardGrid>
-  <Card title="Performant" icon="rocket">
-    Designed for performance. From day one, Volar has been built with performance in mind.
-  </Card>
-  <Card title="Flexible" icon="translate">
-    Add Markdown or MDX files to `src/content/docs` to create new pages.
-  </Card>
-  <Card title="Configure your site" icon="setting">
-    Edit your `sidebar` and other config in `astro.config.mjs`.
-  </Card>
-  <Card title="Read the docs" icon="open-book">
-    Learn more in [the Starlight Docs](https://starlight.astro.build/).
-  </Card>
-</CardGrid>
+<div class="card-cnt not-content">
+  <CardGrid stagger={true}>
+    <Card title="Performant" icon="rocket">
+      Designed for performance. From day one, Volar has been built with performance in mind.
+    </Card>
+    <Card title="Proven" icon="rocket">
+      Volar powers tooling used by millions of users, such as the Vue, Astro and MDX language
+      servers, culminating over 7 millions downloads in total.
+    </Card>
+    <Card title="Flexible" icon="puzzle">
+      Volar is designed to be flexible. It's built to be used in any editor, and with any language.
+    </Card>
+  </CardGrid>
+</div>
 
 ## Team
+
+Volar is built by a team of passionate developers, who are dedicated to making the best tooling for developers.
+
+<TeamMemberList />

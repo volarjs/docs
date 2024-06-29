@@ -1,0 +1,57 @@
+---
+import TeamMember from "./TeamMember.astro";
+import johnsonAvatar from "$assets/team/johnson.jpeg";
+import erikaAvatar from "$assets/team/erika.jpeg";
+import remcoAvatar from "$assets/team/remco.jpeg";
+import type { ImageMetadata } from "astro";
+
+export interface TeamMember {
+  name: string;
+  username: string;
+  avatar: ImageMetadata;
+  description: string;
+  githubProfile?: string;
+}
+
+const teamMembers = [
+  {
+    name: "Johnson Chu",
+    username: "johnsoncodehk",
+    avatar: johnsonAvatar,
+    description: "Johnson is the creator and lead maintainer of Volar.",
+  },
+  {
+    name: "Erika",
+    username: "princesseuh",
+    avatar: erikaAvatar,
+    description:
+      "Erika is a core maintainer on Volar and Astro. She particularly loves focusing on high impact but commonly overlooked work, which is where she found her passion for editor tooling.",
+  },
+  {
+    name: "Remco Haszing",
+    username: "remcohaszing",
+    avatar: remcoAvatar,
+    description:
+      "Remco is a core maintainer on Volar and the unified ecosystem, and lead maintainer of the MDX language server. He loves working with AST and improving developer experience.",
+  },
+] satisfies TeamMember[];
+---
+
+<div class="team-members not-content">
+  {teamMembers.map((member) => <TeamMember {...member} />)}
+</div>
+
+<style>
+  .team-members {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .team-members {
+      flex-direction: column;
+    }
+  }
+</style>

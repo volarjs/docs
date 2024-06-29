@@ -11,6 +11,8 @@
   --sl-color-gray-5: #393838;
   --sl-color-gray-6: #272627;
   --sl-color-black: #181818;
+
+  --sl-color-bg-sidebar: #1f1f1f;
 }
 /* Light mode colors. */
 :root[data-theme="light"] {
@@ -28,6 +30,43 @@
   --sl-color-black: #ffffff;
 }
 
-:root[data-theme="light"] #sponsor-icon {
-  fill: black;
+.site-title {
+  gap: 0.5rem !important;
+  color: var(--sl-color-white);
+}
+
+.site-title:hover {
+  color: var(--sl-color-text-accent);
+}
+
+.card-cnt {
+  margin-top: 7rem !important;
+}
+
+[aria-current="page"],
+[aria-current="page"]:hover,
+[aria-current="page"]:focus {
+  color: var(--sl-color-text-accent) !important;
+  background-color: initial;
+}
+
+:root[data-theme="dark"] mobile-starlight-toc nav {
+  background-color: #1f1f1f;
+}
+
+a {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke,
+    opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+button {
+  transition-property: border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+starlight-toc li a span {
+  word-wrap: normal;
 }

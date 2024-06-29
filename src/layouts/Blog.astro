@@ -1,0 +1,29 @@
+---
+import type { CollectionEntry } from "astro:content";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+---
+
+<StarlightPage
+  frontmatter={{
+    ...post.data,
+    template: "splash",
+    editUrl: `https://github.com/volarjs/docs/tree/main/src/content/blog/${post.id}`,
+  }}
+>
+  <article>
+    <slot />
+  </article>
+</StarlightPage>
+
+<style>
+  article {
+    max-width: 72ch;
+    margin: 0 auto;
+  }
+</style>

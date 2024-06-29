@@ -1,0 +1,278 @@
+---
+title: Services
+---
+
+Services are the building blocks of Volar language servers. They are responsible for providing all the features you'd expect in a language server, completions, diagnostics, hover information, you name it.
+
+While services are technically not tied to individual languages, they are often designed to work with a specific language or file type, including [embedded languages](/core-concepts/embedded-languages).
+
+For example, if you were to implement a Volar language server for HTML, you would likely end up with three different services, one for general HTML support, one for CSS support and one for JavaScript support, the latter two being used for `<style>` and `<script>` tags respectively.
+
+## Shape of a service
+
+A service is a JavaScript object, whose only required property is a `create` method. The `create` method is called when the service is initialized, and it should return an object with methods that implement the various features of the service.
+
+These methods are called by the Volar language server when it needs to perform a specific task, such as providing completions or diagnostics. Those methods map almost exactly to the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP) requests, for instance `textDocument/completion` becomes `provideCompletionItems`, `textDocument/hover` becomes `provideHover`, etc.
+
+```ts title="service.ts"
+export const service = {
+	name: 'my-service', // The name of the service, this is used to identify the service in the logs and in Volar Labs
+	create(context): ServicePluginInstance {
+		return {
+			provideHover(document, position, token) {
+				// Implement hover support here
+			},
+			// More methods...
+		};
+	},
+} satisfies ServicePlugin;
+```
+
+## Using a service
+
+When initializing the language server, the list of services to use is passed as an option to the `initialize` method.
+
+```ts title="server.ts"
+import {
+  createConnection,
+  createServer,
+  createSimpleProjectProviderFactory,
+} from "@volar/language-server/node";
+import { service } from "./service";
+
+const connection = createConnection();
+const server = createServer(connection);
+
+connection.listen();
+
+connection.onInitialize((params) => {
+  return server.initialize(params, createSimpleProjectProviderFactory(), {
+    // ...
+    getServicePlugins() {
+      return [service];
+    },
+  });
+});
+
+connection.onInitialized(() => {
+  server.initialized();
+});
+```
+
+## First-party services
+
+The Volar team maintains a number of first-party services that are ready for use in your Volar language servers. These services should cover the vast majority of common use cases, such as providing completions, diagnostics, hover information, etc for HTML, CSS, JSON, JavaScript and more, or integrating with well-known tools like Emmett, Prettier, etc.
+
+To see a list of all first-party services, see the [volarjs/services](https://github.com/volarjs/services) repository.
+
+## Methods
+
+### `provideCompletionItems`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => CompletionItem[] | Promise<CompletionItem[]>`
+
+This method is called when the user requests completions at a specific position in the document.
+
+```ts title="service.ts"
+import { CompletionItemKind } from '@volar/language-server';
+
+export const service = {
+	name: 'my-service',
+	create(context): ServicePluginInstance {
+		return {
+			provideCompletionItems(document, position, token) {
+				return {
+					isIncomplete: true,
+					items: [
+						{
+							label: 'Hello',
+							kind: CompletionItemKind.Text,
+							isIncomplete: false
+						},
+						{
+							label: 'World',
+							kind: CompletionItemKind.Text,
+							isIncomplete: false
+						},
+					]
+				}
+			},
+		};
+	},
+} satisfies ServicePlugin;
+```
+
+### `resolveCompletionItem`
+
+**Signature:** `(item: CompletionItem, token: CancellationToken) => CompletionItem | Promise<CompletionItem>`
+
+This method is called when the user selects a completion item from the list of completions. It allows you to provide additional information for the selected completion item. This is often used when calculating the full information for completions is expensive and you want to defer it until the user actually selects a specific completion.
+
+### `provideCodeActions`
+
+**Signature:** `(document: TextDocument, range: Range, context: CodeActionContext, token: CancellationToken) => CodeAction[] | Promise<CodeAction[]>`
+
+This method is called when the user requests code actions for a specific range in the document. Code actions are typically used to fix issues or improve the code (e.g. "Extract Method", "Add missing import").
+
+### `resolveCodeAction`
+
+**Signature:** `(action: CodeAction, token: CancellationToken) => CodeAction | Promise<CodeAction>`
+
+This method is called when the user selects a code action from the list of code actions. It allows you to provide additional information for the selected code action.
+
+### `provideHover`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => Hover | Promise<Hover>`
+
+This method is called when the user requests hover information at a specific position in the document.
+
+### `provideSignatureHelp`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => SignatureHelp | Promise<SignatureHelp>`
+
+This method is called when the user requests signature help at a specific position in the document.
+
+### `provideDefinition`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => Location | Location[] | Promise<Location | Location[]>`
+
+This method is called when the user requests the definition of a symbol at a specific position in the document. This method powers features like "Go to Definition".
+
+### `provideReferences`
+
+**Signature:** `(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken) => Location[] | Promise<Location[]>`
+
+This method is called when the user requests references to a symbol at a specific position in the document. This method powers features like "Find All References".
+
+### `provideDocumentHighlights`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => DocumentHighlight[] | Promise<DocumentHighlight[]>`
+
+This method is called when the user requests highlights for a symbol at a specific position in the document.
+
+### `provideDocumentSymbols`
+
+**Signature:** `(document: TextDocument, token: CancellationToken) => SymbolInformation[] | Promise<SymbolInformation[]>`
+
+This method is called when the user requests symbols in the document.
+
+
+### `provideCodeLens`
+
+**Signature:** `(document: TextDocument, token: CancellationToken) => CodeLens[] | Promise<CodeLens[]>`
+
+This method is called when the user requests code lenses in the document.
+
+### `resolveCodeLens`
+
+**Signature:** `(codeLens: CodeLens, token: CancellationToken) => CodeLens | Promise<CodeLens>`
+
+This method is called when the user selects a code lens from the list of code lenses. It allows you to provide additional information for the selected code lens.
+
+### `provideDocumentFormattingEdits`
+
+**Signature:** `(document: TextDocument, options: FormattingOptions, token: CancellationToken) => TextEdit[] | Promise<TextEdit[]>`
+
+This method is called when the user requests formatting for the entire document.
+
+### `provideDocumentRangeFormattingEdits`
+
+**Signature:** `(document: TextDocument, range: Range, options: FormattingOptions, token: CancellationToken) => TextEdit[] | Promise<TextEdit[]>`
+
+This method is called when the user requests formatting for a specific range in the document.
+
+### `provideOnTypeFormattingEdits`
+
+**Signature:** `(document: TextDocument, position: Position, ch: string, options: FormattingOptions, token: CancellationToken) => TextEdit[] | Promise<TextEdit[]>`
+
+This method is called when the user types a specific character in the document.
+
+### `provideRenameEdits`
+
+**Signature:** `(document: TextDocument, position: Position, newName: string, token: CancellationToken) => WorkspaceEdit | Promise<WorkspaceEdit>`
+
+This method is called when the user requests to rename a symbol at a specific position in the document.
+
+### `provideDocumentLinks`
+
+**Signature:** `(document: TextDocument, token: CancellationToken) => DocumentLink[] | Promise<DocumentLink[]>`
+
+This method is called when the user requests links in the document.
+
+### `resolveDocumentLink`
+
+**Signature:** `(link: DocumentLink, token: CancellationToken) => DocumentLink | Promise<DocumentLink>`
+
+This method is called when the user selects a link from the list of links. It allows you to provide additional information for the selected link.
+
+### `provideDocumentColors`
+
+**Signature:** `(document: TextDocument, token: CancellationToken) => ColorInformation[] | Promise<ColorInformation[]>`
+
+This method is called when the user requests colors in the document.
+
+### `provideColorPresentations`
+
+**Signature:** `(color: Color, document: TextDocument, range: Range, token: CancellationToken) => ColorPresentation[] | Promise<ColorPresentation[]>`
+
+This method is called when the user selects a color from the list of colors. It allows you to provide additional information for the selected color.
+
+### `provideFoldingRanges`
+
+**Signature:** `(document: TextDocument, context: FoldingContext, token: CancellationToken) => FoldingRange[] | Promise<FoldingRange[]>`
+
+This method is called when the user requests folding ranges in the document.
+
+### `provideSelectionRanges`
+
+**Signature:** `(document: TextDocument, positions: Position[], token: CancellationToken) => SelectionRange[] | Promise<SelectionRange[]>`
+
+This method is called when the user requests selection ranges at specific positions in the document.
+
+### `provideDocumentSemanticTokens`
+
+**Signature:** `(document: TextDocument, token: CancellationToken) => SemanticTokens | Promise<SemanticTokens>`
+
+This method is called when the user requests semantic tokens in the document.
+
+### `provideDocumentSemanticTokensEdits`
+
+**Signature:** `(document: TextDocument, previousResultId: string, token: CancellationToken) => SemanticTokens | SemanticTokensEdits | Promise<SemanticTokens | SemanticTokensEdits>`
+
+This method is called when the user requests semantic tokens edits in the document.
+
+### `provideLinkedEditingRanges`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => LinkedEditingRanges | Promise<LinkedEditingRanges>`
+
+This method is called when the user requests linked editing ranges at a specific position in the document.
+
+### `provideCallHierarchyItems`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => CallHierarchyItem[] | Promise<CallHierarchyItem[]>`
+
+This method is called when the user requests call hierarchy items for a symbol at a specific position in the document.
+
+### `provideCallHierarchyIncomingCalls`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => CallHierarchyIncomingCall[] | Promise<CallHierarchyIncomingCall[]>`
+
+This method is called when the user requests incoming calls for a symbol at a specific position in the document.
+
+### `provideCallHierarchyOutgoingCalls`
+
+**Signature:** `(document: TextDocument, position: Position, token: CancellationToken) => CallHierarchyOutgoingCall[] | Promise<CallHierarchyOutgoingCall[]>`
+
+This method is called when the user requests outgoing calls for a symbol at a specific position in the document.
+
+### `provideInlayHints`
+
+**Signature:** `(document: TextDocument, token: CancellationToken) => InlayHint[] | Promise<InlayHint[]>`
+
+This method is called when the user requests inlay hints in the document.
+
+### `resolveInlayHint`
+
+**Signature:** `(hint: InlayHint, token: CancellationToken) => InlayHint | Promise<InlayHint>`
+
+This method is called when the user selects an inlay hint from the list of inlay hints. It allows you to provide additional information for the selected inlay hint.

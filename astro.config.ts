@@ -1,5 +1,6 @@
 import starlight from "@astrojs/starlight";
-import { defineConfig, sharpImageService } from "astro/config";
+import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
+import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,18 +11,26 @@ export default defineConfig({
         src: "./src/assets/logo.svg",
         alt: "Volar's logo, a light-blue prism with a very subtle tint of red in the top right and a wave going through the prism.",
       },
+      expressiveCode: {
+        plugins: [pluginCollapsibleSections()],
+      },
       title: "Volar.js",
       description: "The Embedded Language Tooling Framework",
       social: {
         github: "https://github.com/volarjs/",
         twitter: "https://twitter.com/johnsoncodehk",
-        discord: "https://discord.gg/Ha7XJbMJZc",
+        discord: "https://discord.gg/N94ECvy2uW",
       },
       customCss: ["./src/styles/custom.css"],
       editLink: {
         baseUrl: "https://github.com/volarjs/docs/edit/main/",
       },
       lastUpdated: true,
+      components: {
+        SiteTitle: "./src/components/starlight/SiteTitle.astro",
+        TableOfContents: "./src/components/starlight/TableOfContents.astro",
+        PageTitle: "./src/components/starlight/PageTitle.astro",
+      },
       sidebar: [
         {
           label: "Core Concepts",
@@ -47,7 +56,4 @@ export default defineConfig({
       ],
     }),
   ],
-
-  // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
-  image: { service: sharpImageService() },
 });

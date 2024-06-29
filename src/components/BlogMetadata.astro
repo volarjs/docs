@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  entry: CollectionEntry<"blog">;
+  authors: CollectionEntry<"authors">[];
+}
+
+const { authors, entry } = Astro.props;
+---
+
+<section class="not-content">
+  {
+    authors && (
+      <div>
+        {authors.map((author) => (
+          <span>
+            <img src={author.data.avatar?.src} alt={author.data.name} width="24" height="24" />
+            {author.data.name}
+          </span>
+        ))}
+      </div>
+    )
+  }
+  <time datetime={entry.data.date.toString()}>
+    {
+      new Date(entry.data.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    }
+  </time>
+
+  <style>
+    section {
+      margin-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    div {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+    }
+
+    img {
+      border-radius: 9999px;
+      margin-right: 0.5rem;
+    }
+  </style>
+</section>

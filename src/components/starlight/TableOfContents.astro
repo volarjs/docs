@@ -1,0 +1,17 @@
+---
+import Default from "@astrojs/starlight/components/TableOfContents.astro";
+import Sponsors from "../Sponsors.astro";
+import { ComponentProps } from "astro/types";
+
+type Props = ComponentProps<typeof Default>;
+---
+
+<Default {...Astro.props}><slot /></Default>
+<h2>Sponsors</h2>
+<Sponsors smallPadding />
+
+<style>
+  h2 {
+    margin-top: 2rem;
+  }
+</style>
