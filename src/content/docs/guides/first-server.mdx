@@ -503,7 +503,7 @@ A language definition, as its core, is simply a JavaScript object with two metho
 
 Every file that the language server will handle will have a corresponding `VirtualCode` object. The language server will create these objects when a file is opened, and update them when the file is changed.
 
-```ts
+```ts title="packages/server/src/languagePlugin.ts"
 import type { LanguagePlugin } from "@volar/language-core";
 import type { URI } from "vscode-uri";
 
