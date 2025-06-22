@@ -151,9 +151,9 @@ Finally, create a `.vscode` directory in the root of the project, and add a `lau
         "--profile-temp",
         "--skip-release-notes",
         "--skip-welcome",
-        "--extensionDevelopmentPath=${workspaceRoot}/packages/vscode"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/client"
       ],
-      "outFiles": ["${workspaceRoot}/packages/vscode/dist/*.js"]
+      "outFiles": ["${workspaceFolder}/packages/client/dist/*.js"]
     }
   ]
 }
@@ -230,7 +230,7 @@ yarn add @volar/language-server @volar/vscode vscode-languageclient @types/vscod
 </TabItem>
 </Tabs>
 
-Next, create a `tsconfig.json` file in the `packages/client` folder to configure TypeScript, which will be used as a build tool in this guide. This file will tell TypeScript to output the compiled JavaScript files to a `dist` directory.
+Next, create a `tsconfig.json` file in the `packages/client` folder to configure TypeScript, which will be used as a build tool in this guide. This file will tell TypeScript to output the compiled JavaScript files to a `out` directory.
 
 As previously mentioned, this file will extend the base configuration in the `tsconfig.base.json` file that was created earlier at the root of the project.
 
