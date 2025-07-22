@@ -45,13 +45,15 @@ export default defineConfig({
         },
         {
           label: "Guides",
+          translations: { 'zh-CN': '指南' },
           items: [
-            { label: "Your First Volar Language Server", link: "/guides/first-server" },
-            { label: "File Structure", link: "/guides/file-structure" },
+            { label: "Your First Volar Language Server", link: "/guides/first-server", translations: { 'zh-CN': '你的第一个 Volar 语言服务器' } },
+            { label: "File Structure", link: "/guides/file-structure", translations: { 'zh-CN': '文件结构' } },
           ],
         },
         {
           label: "Reference",
+          translations: { 'zh-CN': '参考' },
           autogenerate: { directory: "reference" },
         },
       ],
