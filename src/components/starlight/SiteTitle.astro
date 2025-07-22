@@ -3,9 +3,19 @@ import type { Props } from "@astrojs/starlight/props";
 import AstrolightSiteTitle from "@astrojs/starlight/components/SiteTitle.astro";
 
 const menuItems = [
-  { name: "Docs", href: "/core-concepts/why-volar" },
-  { name: "Blog", href: "/blog" },
+  { 
+    name: { 'en-US': "Docs", 'zh-CN': '文档' },
+    id: 'docs',
+    href: { 'en-US': "/core-concepts/why-volar", 'zh-CN': "/zh-cn/core-concepts/why-volar" }
+  },
+  { 
+    name: { 'en-US': "Blog", 'zh-CN': '博客' },
+    id: 'blog',
+    href: { 'en-US': "/blog", 'zh-CN': "/blog" }
+  },
 ];
+type DefinedI18nName = keyof typeof menuItems[number]['name']
+type DefinedHref = keyof typeof menuItems[number]['href'];
 
 function pathsMatch(pathA: string, pathB: string): boolean {
   return pathB.includes(pathA);
@@ -21,14 +31,14 @@ function pathsMatch(pathA: string, pathB: string): boolean {
     {
       menuItems.map((menuItem) => (
         <a
-          href={menuItem.href}
+          href={menuItem.href[Astro.currentLocale as DefinedHref] || menuItem.href['en-US']}
           aria-current={
-            (pathsMatch(encodeURI(menuItem.href), Astro.url.pathname) ||
-              (menuItem.name === "Docs" && Astro.props.hasSidebar)) &&
+            (pathsMatch(encodeURI(menuItem.href[Astro.currentLocale as DefinedHref] || menuItem.href['en-US']), Astro.url.pathname) ||
+              (menuItem.id === "Docs" && Astro.props.hasSidebar)) &&
             "page"
           }
         >
-          <span>{menuItem.name}</span>
+          <span>{menuItem.name[Astro.currentLocale as DefinedI18nName] || menuItem.name['en-US']}</span>
         </a>
       ))
     }
