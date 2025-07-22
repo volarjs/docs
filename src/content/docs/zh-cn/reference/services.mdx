@@ -1,0 +1,279 @@
+---
+title: 服务
+description: 列出 VolarJS 中所有可用服务的列表, 以及它们的功能。
+---
+
+服务是 Volar 语言服务器的构建块。它们负责提供您在语言服务器中所期望的所有功能，包括补全、诊断、悬停信息等。
+
+虽然服务在技术上并不与单个语言绑定，但它们通常被设计为与特定语言或文件类型一起使用，包括 [嵌入式语言](/core-concepts/embedded-languages)。
+
+例如，如果您要为 HTML 实现一个 Volar 语言服务器，您可能最终会得到三个不同的服务，一个用于一般的 HTML 支持，一个用于 CSS 支持，一个用于 JavaScript 支持，后两个分别用于 `<style>` 和 `<script>` 标签。
+
+## 服务的结构
+
+服务是一个 JavaScript 对象，其唯一必需的属性是 `create` 方法。`create` 方法在服务初始化时被调用，它应该返回一个包含实现服务各种功能的方法的对象。
+
+这些方法在 Volar 语言服务器需要执行特定任务时被调用，例如提供补全或诊断。这些方法几乎完全映射到 [语言服务器协议](https://microsoft.github.io/language-server-protocol/) (LSP) 请求，例如 `textDocument/completion` 变为 `provideCompletionItems`，`textDocument/hover` 变为 `provideHover`，等等。
+
+```ts title="service.ts"
+export const service = {
+	name: 'my-service', // 服务的名称, 用于在日志和 Volar Labs 中标识服务。
+	create(context): ServicePluginInstance {
+		return {
+			provideHover(document, position, token) {
+				// 在这里实现悬停支持
+			},
+			// 更多方法...
+		};
+	},
+} satisfies ServicePlugin;
+```
+
+## 使用服务
+
+在初始化语言服务器时，使用的服务列表作为选项传递给 `initialize` 方法。
+
+```ts title="server.ts"
+import {
+  createConnection,
+  createServer,
+  createSimpleProjectProviderFactory,
+} from "@volar/language-server/node";
+import { service } from "./service";
+
+const connection = createConnection();
+const server = createServer(connection);
+
+connection.listen();
+
+connection.onInitialize((params) => {
+  return server.initialize(params, createSimpleProjectProviderFactory(), {
+    // ...
+    getServicePlugins() {
+      return [service];
+    },
+  });
+});
+
+connection.onInitialized(() => {
+  server.initialized();
+});
+```
+
+## 第一方服务支持
+
+Volar 团队维护了一些可以在您的 Volar 语言服务器中使用的第一方服务。这些服务应该涵盖绝大多数常见用例，例如为 HTML、CSS、JSON、JavaScript 等提供补全、诊断、悬停信息等，或与 Emmett、Prettier 等知名工具集成。
+
+要查看所有第一方服务的列表，请参阅 [volarjs/services](https://github.com/volarjs/services) 存储库。
+
+## 方法参考
+
+### `provideCompletionItems`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => CompletionItem[] | Promise<CompletionItem[]>`
+
+当用户在文档的特定位置请求补全时，将调用此方法。
+
+```ts title="service.ts"
+import { CompletionItemKind } from '@volar/language-server';
+
+export const service = {
+	name: 'my-service',
+	create(context): ServicePluginInstance {
+		return {
+			provideCompletionItems(document, position, token) {
+				return {
+					isIncomplete: true,
+					items: [
+						{
+							label: 'Hello',
+							kind: CompletionItemKind.Text,
+							isIncomplete: false
+						},
+						{
+							label: 'World',
+							kind: CompletionItemKind.Text,
+							isIncomplete: false
+						},
+					]
+				}
+			},
+		};
+	},
+} satisfies ServicePlugin;
+```
+
+### `resolveCompletionItem`
+
+**方法签名:** `(item: CompletionItem, token: CancellationToken) => CompletionItem | Promise<CompletionItem>`
+
+当用户从补全列表中选择一个补全项时，将调用此方法。它允许您为所选的补全项提供额外的信息。这通常在计算补全的完整信息很昂贵时使用，您希望推迟到用户实际选择特定补全时再进行计算。
+
+### `provideCodeActions`
+
+**方法签名:** `(document: TextDocument, range: Range, context: CodeActionContext, token: CancellationToken) => CodeAction[] | Promise<CodeAction[]>`
+
+当用户请求文档中特定范围的代码操作时，将调用此方法。代码操作通常用于修复问题或改善代码（例如“提取方法”、“添加缺失的导入”）。
+
+### `resolveCodeAction`
+
+**方法签名:** `(action: CodeAction, token: CancellationToken) => CodeAction | Promise<CodeAction>`
+
+当用户从代码操作列表中选择一个代码操作时，将调用此方法。它允许您为所选的代码操作提供额外的信息。
+
+### `provideHover`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => Hover | Promise<Hover>`
+
+当用户请求文档中特定位置的悬停信息时，将调用此方法。
+
+### `provideSignatureHelp`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => SignatureHelp | Promise<SignatureHelp>`
+
+当用户请求文档中特定位置的签名帮助时，将调用此方法。
+
+### `provideDefinition`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => Location | Location[] | Promise<Location | Location[]>`
+
+当用户请求文档中特定位置的符号定义时，将调用此方法。此方法为“转到定义”等功能提供支持。
+
+### `provideReferences`
+
+**方法签名:** `(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken) => Location[] | Promise<Location[]>`
+
+当用户请求文档中特定位置的符号引用时，将调用此方法。此方法为“查找所有引用”等功能提供支持。
+
+### `provideDocumentHighlights`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => DocumentHighlight[] | Promise<DocumentHighlight[]>`
+
+当用户请求文档中特定位置的符号高亮时，将调用此方法。
+
+### `provideDocumentSymbols`
+
+**方法签名:** `(document: TextDocument, token: CancellationToken) => SymbolInformation[] | Promise<SymbolInformation[]>`
+
+当用户请求文档中的符号时，将调用此方法。
+
+
+### `provideCodeLens`
+
+**方法签名:** `(document: TextDocument, token: CancellationToken) => CodeLens[] | Promise<CodeLens[]>`
+
+当用户请求文档中的代码镜头时，将调用此方法。
+
+### `resolveCodeLens`
+
+**方法签名:** `(codeLens: CodeLens, token: CancellationToken) => CodeLens | Promise<CodeLens>`
+
+当用户从代码镜头列表中选择一个代码镜头时，将调用此方法。它允许您为所选的代码镜头提供额外的信息。
+
+### `provideDocumentFormattingEdits`
+
+**方法签名:** `(document: TextDocument, options: FormattingOptions, token: CancellationToken) => TextEdit[] | Promise<TextEdit[]>`
+
+当用户请求对整个文档进行格式化时，将调用此方法。
+
+### `provideDocumentRangeFormattingEdits`
+
+**方法签名:** `(document: TextDocument, range: Range, options: FormattingOptions, token: CancellationToken) => TextEdit[] | Promise<TextEdit[]>`
+
+当用户请求对文档中特定范围进行格式化时，将调用此方法。
+
+### `provideOnTypeFormattingEdits`
+
+**方法签名:** `(document: TextDocument, position: Position, ch: string, options: FormattingOptions, token: CancellationToken) => TextEdit[] | Promise<TextEdit[]>`
+
+当用户在文档中输入特定字符时，将调用此方法。
+
+### `provideRenameEdits`
+
+**方法签名:** `(document: TextDocument, position: Position, newName: string, token: CancellationToken) => WorkspaceEdit | Promise<WorkspaceEdit>`
+
+当用户请求对文档中特定位置的符号进行重命名时，将调用此方法。
+
+### `provideDocumentLinks`
+
+**方法签名:** `(document: TextDocument, token: CancellationToken) => DocumentLink[] | Promise<DocumentLink[]>`
+
+当用户请求文档中的链接时，将调用此方法。
+
+### `resolveDocumentLink`
+
+**方法签名:** `(link: DocumentLink, token: CancellationToken) => DocumentLink | Promise<DocumentLink>`
+
+当用户从链接列表中选择一个链接时，将调用此方法。它允许您为所选的链接提供额外的信息。
+
+### `provideDocumentColors`
+
+**方法签名:** `(document: TextDocument, token: CancellationToken) => ColorInformation[] | Promise<ColorInformation[]>`
+
+当用户请求文档中的颜色时，将调用此方法。
+
+### `provideColorPresentations`
+
+**方法签名:** `(color: Color, document: TextDocument, range: Range, token: CancellationToken) => ColorPresentation[] | Promise<ColorPresentation[]>`
+
+当用户从颜色列表中选择一个颜色时，将调用此方法。它允许您为所选的颜色提供额外的信息。
+
+### `provideFoldingRanges`
+
+**方法签名:** `(document: TextDocument, context: FoldingContext, token: CancellationToken) => FoldingRange[] | Promise<FoldingRange[]>`
+
+当用户请求文档中的折叠范围时，将调用此方法。
+
+### `provideSelectionRanges`
+
+**方法签名:** `(document: TextDocument, positions: Position[], token: CancellationToken) => SelectionRange[] | Promise<SelectionRange[]>`
+
+当用户请求文档中特定位置的选择范围时，将调用此方法。
+
+### `provideDocumentSemanticTokens`
+
+**方法签名:** `(document: TextDocument, token: CancellationToken) => SemanticTokens | Promise<SemanticTokens>`
+
+当用户请求文档中的语义标记时，将调用此方法。
+
+### `provideDocumentSemanticTokensEdits`
+
+**方法签名:** `(document: TextDocument, previousResultId: string, token: CancellationToken) => SemanticTokens | SemanticTokensEdits | Promise<SemanticTokens | SemanticTokensEdits>`
+
+当用户请求文档中的语义标记编辑时，将调用此方法。
+
+### `provideLinkedEditingRanges`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => LinkedEditingRanges | Promise<LinkedEditingRanges>`
+
+当用户请求文档中特定位置的联动编辑范围时，将调用此方法。
+
+### `provideCallHierarchyItems`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => CallHierarchyItem[] | Promise<CallHierarchyItem[]>`
+
+当用户请求文档中特定位置的符号的调用层次结构项时，将调用此方法。
+
+### `provideCallHierarchyIncomingCalls`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => CallHierarchyIncomingCall[] | Promise<CallHierarchyIncomingCall[]>`
+
+当用户请求文档中特定位置的符号的入站调用时，将调用此方法。
+
+### `provideCallHierarchyOutgoingCalls`
+
+**方法签名:** `(document: TextDocument, position: Position, token: CancellationToken) => CallHierarchyOutgoingCall[] | Promise<CallHierarchyOutgoingCall[]>`
+
+当用户请求文档中特定位置的符号的出站调用时，将调用此方法。
+
+### `provideInlayHints`
+
+**方法签名:** `(document: TextDocument, token: CancellationToken) => InlayHint[] | Promise<InlayHint[]>`
+
+当用户请求文档中的内联提示时，将调用此方法。
+
+### `resolveInlayHint`
+
+**方法签名:** `(hint: InlayHint, token: CancellationToken) => InlayHint | Promise<InlayHint>`
+
+当用户从内联提示列表中选择一个内联提示时，将调用此方法。它允许您为所选的内联提示提供额外的信息。
