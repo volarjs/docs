@@ -34,26 +34,39 @@ export default defineConfig({
       sidebar: [
         {
           label: "Core Concepts",
+          translations: { 'zh-CN': '核心概念' },
           items: [
             // Each item here is one entry in the navigation menu.
-            { label: "Why Volar?", link: "/core-concepts/why-volar" },
-            { label: "Embedded Languages", link: "/core-concepts/embedded-languages" },
+            { label: "Why Volar?", link: "/core-concepts/why-volar", translations: { 'zh-CN': '为什么选择 Volar?' } },
+            { label: "Embedded Languages", link: "/core-concepts/embedded-languages", translations: { 'zh-CN': '嵌入式语言' } },
             { label: "Volar Labs", link: "/core-concepts/volar-labs" },
           ],
           // TODO: Use `autogenerate` once it allows you to order the sidebar
         },
         {
           label: "Guides",
+          translations: { 'zh-CN': '指南' },
           items: [
-            { label: "Your First Volar Language Server", link: "/guides/first-server" },
-            { label: "File Structure", link: "/guides/file-structure" },
+            { label: "Your First Volar Language Server", link: "/guides/first-server", translations: { 'zh-CN': '你的第一个 Volar 语言服务器' } },
+            { label: "File Structure", link: "/guides/file-structure", translations: { 'zh-CN': '文件结构' } },
           ],
         },
         {
           label: "Reference",
+          translations: { 'zh-CN': '参考' },
           autogenerate: { directory: "reference" },
         },
       ],
+      locales: {
+        root: {
+          label: 'English',
+          lang: 'en-US',
+        },
+        'zh-cn': {
+          label: '简体中文',
+          lang: 'zh-CN',
+        }
+      }
     }),
   ],
 });

@@ -1,0 +1,126 @@
+---
+title: 语言
+---
+
+> 这个页面正在编写中。想要为它贡献一些文档，或者想要改进它？[在 GitHub 上编辑这个页面](https://github.com/volarjs/docs/blob/main/src/content/docs/reference/languages.mdx)
+
+作为一个语言服务器框架, Volar 允许您定义要在项目中支持的语言。
+
+## 语言定义的形状
+
+语言定义是一个包含 `createVirtualCode` 和 `updateVirtualCode` 函数的 JavaScript 对象。
+
+```ts title="src/my-language.ts"
+export const language = {
+	createVirtualCode(fileId, languageId, snapshot) {
+		// 创建一个虚拟代码对象
+	},
+	updateVirtualCode(_fileId, languageCode, snapshot) {
+		// 更新虚拟代码对象
+	},
+};
+```
+
+正如名称所示，这些方法创建和更新虚拟代码 `VirtualCode`。为每个语言服务器处理的文件创建一个 `VirtualCode` 对象。然后可以在提供语言服务器功能的 [services](/reference/services) 的钩子中访问这些对象，因此它们也是存储有关文件的附加信息的地方，这些信息可能对服务的功能很有用。
+
+虽然不是必须的，但一个常见的模式是定义一个实现 `VirtualCode` 接口的 JavaScript 类，这样可以更方便地为虚拟代码对象添加更多属性和方法，并且可以使用 `instanceof` 来检查虚拟代码对象是否属于某个类型。
+
+```ts title="src/my-language.ts"
+import type { LanguagePlugin, VirtualCode } from '@volar/language-core';
+
+export const language = {
+	createVirtualCode(fileId, languageId, snapshot) {
+		if (languageId !== 'my-language')
+			return;
+
+		return new MyLanguageVirtualCode(snapshot);
+	},
+	updateVirtualCode(_fileId, languageCode, snapshot) {
+		languageCode.update(snapshot);
+		return languageCode;
+	},
+} satisfies LanguagePlugin<MyLanguageVirtualCode>;
+
+export class MyLanguageVirtualCode implements VirtualCode {
+	id = 'root';
+	languageId = 'my-language';
+	mappings = []
+
+	constructor(
+		public snapshot: ts.IScriptSnapshot
+	) {
+		this.onSnapshotUpdated();
+	}
+
+	public update(newSnapshot: ts.IScriptSnapshot) {
+		this.snapshot = newSnapshot;
+		this.onSnapshotUpdated();
+	}
+
+	onSnapshotUpdated() {
+		// Update the virtual code object
+	}
+}
+```
+
+这是一个语言定义的简单示例，其中 `MyVirtualLanguageCode` 仅执行严格的最小操作。在实际的语言定义中，您很可能会在 `MyLanguageVirtualCode` 类上拥有更多的属性和方法。
+
+### 嵌入式语言
+
+如果您的语言支持 [嵌入式语言](/zh-cn/core-concepts/embedded-languages/)，则您的实例 `VirtualCode` 应该包含一个 `embeddedCodes` 属性，该属性包含嵌入式语言的 `VirtualCode` 实例数组。
+
+```ts title="src/my-language.ts" ins={20, 34-52} collapse={1-14, 22-31}
+import type { LanguagePlugin, VirtualCode } from '@volar/language-core';
+
+export const language = {
+	createVirtualCode(fileId, languageId, snapshot) {
+		if (languageId !== 'my-language')
+			return;
+
+		return new MyLanguageVirtualCode(snapshot);
+	},
+	updateVirtualCode(_fileId, languageCode, snapshot) {
+		languageCode.update(snapshot);
+		return languageCode;
+	},
+} satisfies LanguagePlugin<MyLanguageVirtualCode>;
+
+export class MyLanguageVirtualCode implements VirtualCode {
+	id = 'root';
+	languageId = 'my-language';
+	mappings = []
+	embeddedCodes: VirtualCode[] = []
+
+	constructor(
+		public snapshot: ts.IScriptSnapshot
+	) {
+		this.onSnapshotUpdated();
+	}
+
+	public update(newSnapshot: ts.IScriptSnapshot) {
+		this.snapshot = newSnapshot;
+		this.onSnapshotUpdated();
+	}
+
+	onSnapshotUpdated() {
+		const snapshotContent = this.snapshot.getText(0, this.snapshot.getLength());
+
+		// Find embedded languages
+		const embeddedLanguages = findEmbeddedLanguages(snapshotContent);
+
+		// Create virtual code objects for embedded languages
+		this.embeddedCodes = embeddedLanguages.map(embeddedLanguage => {
+			return {
+				id: embeddedLanguage.id,
+				languageId: embeddedLanguage.languageId,
+				mappings: [],
+				snapshot: {
+						getText: (start, end) => embeddedLanguage.content.substring(start, end),
+						getLength: () => embeddedLanguage.content.length,
+						getChangeRange: () => undefined,
+					}
+			}
+		});
+	}
+}
+```

@@ -1,0 +1,53 @@
+---
+title: Volar
+description: VolarJS 是一个现代嵌入式语言工具框架，旨在简化编辑器语言支持的开发。
+template: splash
+hero:
+  tagline: 嵌入式语言工具框架。
+  image:
+    file: ../../../assets/logo.svg
+  actions:
+    - text: 为什么选择Volar?
+      link: /zh-cn/core-concepts/why-volar
+      icon: right-arrow
+      variant: primary
+    - text: 入门项目
+      link: https://github.com/volarjs/starter
+      icon: right-arrow
+      variant: secondary
+    - text: 在 GitHub 上查看
+      link: https://github.com/volarjs
+      icon: external
+      variant: minimal
+---
+
+import Sponsors from "$components/Sponsors.astro";
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import TeamMemberList from "$components/TeamMemberList.astro";
+import ModifyHeader from "$components/ModifyHeader.astro";
+
+<ModifyHeader />
+
+## Sponsors
+
+<Sponsors />
+
+<div class="card-cnt not-content">
+  <CardGrid stagger={true}>
+    <Card title="性能" icon="rocket">
+      专为性能而设计。从第一天起, Volar 就以性能为设计理念。
+    </Card>
+    <Card title="成熟" icon="rocket">
+      Volar 为数百万用户使用的工具提供支持, 例如 Vue、Astro 和 MDX 语言服务器, 最终下载总量超过 700 万次。
+    </Card>
+    <Card title="灵活" icon="puzzle">
+      Volar 被设计为可以灵活使用。它可以在任何编辑器中使用, 并支持任何语言。
+    </Card>
+  </CardGrid>
+</div>
+
+## 团队
+
+Volar 是由一群充满热情的开发者构建的，他们致力于为开发者提供最好的工具。
+
+<TeamMemberList />

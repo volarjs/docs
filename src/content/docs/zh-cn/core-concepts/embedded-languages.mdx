@@ -1,0 +1,12 @@
+---
+title: 嵌入式语言
+description: VolarJS 对嵌入式语言提供了顶级支持，并可以大大简化在文件不同部分之间实现编辑功能所需的映射。
+---
+
+如今，许多编程语言都是由其他编程语言组成的。最著名的例子是 HTML, 在其中你会发现 JavaScript 和 CSS 分别位于 `<script>` 和 `<style>` 块中。除了这些，你甚至可以在 HTML 元素的 `style` 属性中找到一些内联 CSS, 在 HTML 元素的 `onclick`（和其他事件）属性中找到一些内联 JavaScript。
+
+实际上，这种行为的例子相当多，尤其是在 Web 上：[Vue 的单文件组件](https://vuejs.org/guide/scaling-up/sfc.html) 中不同的 Block, [Svelte 组件](https://svelte.dev/docs/svelte-components) 中的部分，[Astro 组件](https://docs.astro.build/en/core-concepts/astro-components/) 中的前置语法和基于 JSX 的组件模板，[Markdown](https://spec.commonmark.org/0.29/#fenced-code-blocks) 中的不同块（更不用说常见的 YAML 前置语法）, 等等。
+
+因此, Volar 是基于这样一个原则构建的: 你的语言很可能会有这样的嵌入式语言, 并且对它们提供了顶级支持。值得注意的是, Volar 可以大大简化在文件不同部分之间实现编辑功能所需的映射。
+
+**如果你的语言没有嵌入式语言：这完全没问题！** Volar 仍然可以很好地为你工作，并且如果有一天你决定向你的语言添加嵌入式语言，它将随时准备好。

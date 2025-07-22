@@ -1,0 +1,575 @@
+---
+title: 创建你的第一个 Volar 语言服务器
+description: 本指南将教你如何创建一个简单的 Volar 语言服务器。
+---
+
+> 这个页面正在编写中。想要为它贡献一些文档, 或者想要改进它吗？[在 GitHub 上编辑这个页面](https://github.com/volarjs/docs/blob/main/src/content/docs/guides/first-server.mdx)
+
+import { Tabs, TabItem, Aside, FileTree } from "@astrojs/starlight/components";
+
+在这个指南中, 你将学习如何创建一个简单的 Volar 语言服务器和 VS Code 客户端。为了保持简单, 这个语言将看起来非常像 HTML, 尽管有一个小变化: 只允许一个 `<style>` 标签。这个语言将被称为 `HTML1`。
+
+这个指南假设你对 TypeScript 和 Node.js 有基本的了解, 并且对什么是语言服务器有一定的了解。如果你不熟悉语言服务器, 你可能想要在继续之前阅读 [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) 首页上的“什么是语言服务器协议？”部分。
+
+> 💡 想要直接克隆模版项目吗？查看 GitHub 上的 [starter project](https://github.com/volarjs/starter) 。
+
+## 先决条件
+
+- [Visual Studio Code](https://code.visualstudio.com/) v1.55 或以上版本.
+- [Node.js](https://nodejs.org/en/) v14 或以上版本.
+- 对 JavaScript 和 Node.js 的基本了解.
+- （可选）为 VS Code 安装 [Volar Labs](https://volarjs.dev/core-concepts/volar-labs/) 扩展.
+
+## 开始
+
+首先创建一个新的项目目录并初始化一个新的 Node.js 项目: 
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# 使用 npm 创建一个新项目
+npm init
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# 使用 pnpm 创建一个新项目
+pnpm init
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# 使用 Yarn 创建一个新项目
+yarn init .
+```
+
+</TabItem>
+</Tabs>
+
+为了能够在同一个仓库中同时拥有语言服务器和 VS Code 客户端, [语言服务器的常见模式](/guides/file-structure)是创建一个新的 `packages` 目录来包含这两个部分, 这实际上就是所谓的 monorepo (多包仓库)。
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# 使用 npm 创建一个新 monorepo 项目
+npm init -w ./packages/server
+npm init -w ./packages/client
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# 使用 pnpm 创建一个新 monorepo 项目
+mkdir -p ./packages/server ./packages/client
+echo -e 'packages:\n  - "packages/*"' > pnpm-workspace.yaml
+# 进入 packages 中新创建的两个文件夹并运行 `pnpm init`
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# 使用 Yarn 创建一个新 monorepo 项目
+yarn init -w ./packages/server
+yarn init -w ./packages/client
+```
+
+</TabItem>
+</Tabs>
+
+<Aside type="note">
+下面假定你将客户端命名为 `vscode-html1`, 服务器端命名为 `@html1/language-server`。
+
+你可以根据自己的喜好命名它们, 但请确保在后续操作中相应地调整指南中的内容。
+
+</Aside>
+
+### 安装和配置 TypeScript
+
+在本指南的后面部分, 将使用 TypeScript 来编写语言服务器和客户端, 并将 TypeScript 代码编译为 JavaScript, 因此我们现在将其安装。
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# 使用 npm 安装 TypeScript
+npm install --save-dev typescript
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# 使用 pnpm 安装 TypeScript
+pnpm add --save-dev typescript
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# 使用 Yarn 安装 TypeScript
+yarn add --dev typescript
+```
+
+</TabItem>
+</Tabs>
+
+此外, 我们将创建一个基础的 TypeScript 配置文件, 该文件将在服务器和客户端之间共享。此文件将用于设置两个项目部分的共同 TypeScript 编译器选项。
+
+```json title="tsconfig.base.json"
+{
+  "compilerOptions": {
+    "module": "nodenext"
+  }
+}
+```
+
+### 定义 VS Code 任务
+
+最后, 在项目根目录中创建一个 `.vscode` 目录, 并向其中添加一个 `launch.json` 文件。此文件定义了 [一个任务](https://code.visualstudio.com/docs/editor/tasks#_typescript-hello-world), 可以在后续轻松启动扩展。
+
+```json title=".vscode/launch.json"
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-updates",
+        "--disable-workspace-trust",
+        "--profile-temp",
+        "--skip-release-notes",
+        "--skip-welcome",
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/client"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/client/dist/*.js"]
+    }
+  ]
+}
+```
+
+当所有这些完成后, 你的项目结构应该如下所示: 
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+- packages/
+  - client/
+    - package.json
+  - server/
+    - package.json
+- package.json
+- tsconfig.base.json
+
+</FileTree>
+
+## 创建客户端
+
+客户端将是一个 VS Code 扩展, 这需要 [一个 `package.json` 文件, 包含一些特定字段](https://code.visualstudio.com/api/references/extension-manifest)。在 `packages/client` 文件夹中, 编辑 `package.json` 文件, 使其如下所示: 
+
+```json title="packages/client/package.json"
+{
+  "name": "vscode-html1",
+  "displayName": "HTML1 Client",
+  "description": "A VS Code extension for HTML1.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.55.0"
+  },
+  "activationEvents": ["onLanguage:html1"],
+  "main": "./src/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "html1",
+        "extensions": [".html1"]
+      }
+    ]
+  }
+}
+```
+
+此外, 还需要一些来自 Volar 和 VS Code 的依赖项。确保你在正确的文件夹中（`packages/client`）, 并通过运行以下命令安装依赖项: 
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# 使用 npm 安装依赖项
+npm install @volar/language-server @volar/vscode vscode-languageclient @types/vscode ../server
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+# 使用 pnpm 安装依赖项
+pnpm install @volar/language-server @volar/vscode vscode-languageclient @types/vscode ../server
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+# 使用 Yarn 安装依赖项
+yarn add @volar/language-server @volar/vscode vscode-languageclient @types/vscode ../server
+```
+
+</TabItem>
+</Tabs>
+
+下一步, 在 `packages/client` 文件夹中创建一个 `tsconfig.json` 文件来配置 TypeScript, 这将在本指南中用作构建工具。此文件将告诉 TypeScript 将编译后的 JavaScript 文件输出到 `out` 目录。
+
+如前所述, 这个文件会继承之前在项目根目录创建的 `tsconfig.base.json` 基础配置。
+
+```jsonc title="packages/client/tsconfig.json"
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out",
+    "rootDir": "src",
+  },
+  "include": ["src"],
+}
+```
+
+然后, 在 `packages/client` 文件夹中创建一个新的 `src` 目录, 并向其中添加一个新的 `extension.ts` 文件。此文件将包含客户端扩展的代码。
+
+这段代码的大部分都是用于启动语言服务器的样板代码, 虽然看起来内容很多且不太有趣, 但它对于扩展的正常运行至关重要。
+
+```ts title="packages/client/src/extension.ts"
+import * as serverProtocol from "@volar/language-server/protocol";
+import { activateAutoInsertion, createLabsInfo } from "@volar/vscode";
+import * as vscode from "vscode";
+import * as lsp from "vscode-languageclient/node";
+
+let client: lsp.BaseLanguageClient;
+
+// 如其名称所示, 此函数在扩展被激活时调用。
+export async function activate(context: vscode.ExtensionContext) {
+  const serverModule = vscode.Uri.joinPath(
+    context.extensionUri,
+    "node_modules",
+    "@html1/language-server",
+    "dist",
+    "server.js",
+  );
+  const serverOptions: lsp.ServerOptions = {
+    run: {
+      module: serverModule.fsPath,
+      transport: lsp.TransportKind.ipc,
+      options: { execArgv: <string[]>[] },
+    },
+    debug: {
+      module: serverModule.fsPath,
+      transport: lsp.TransportKind.ipc,
+      options: { execArgv: ["--nolazy", "--inspect=" + 6009] },
+    },
+  };
+
+  // 用于控制语言客户端的选项, 这里我们只关注 HTML1 文件。
+  // 语言服务器也可以接受初始化选项, 这些选项会在服务器启动时传递, 
+  // 但这里我们没有需要传递的内容。
+  const clientOptions: lsp.LanguageClientOptions = {
+    documentSelector: [{ language: "html1" }],
+    initializationOptions: {},
+  };
+
+  // 使用我们定义的所有选项, 创建语言客户端, 并启动它。
+  client = new lsp.LanguageClient(
+    "html1-language-server",
+    "HTML1 Language Server",
+    serverOptions,
+    clientOptions,
+  );
+  await client.start();
+
+  // 额外的: 为自动插入闭合标签提供支持（例如: <div> -> <div></div>）
+  activateAutoInsertion("html1", client);
+
+  // 添加该代码以添加对 Volar Labs 的支持
+  // https://volarjs.dev/core-concepts/volar-labs/
+  const labsInfo = createLabsInfo(serverProtocol);
+  labsInfo.addLanguageClient(client);
+  return labsInfo.extensionExports;
+}
+
+// ... 当扩展被停用时会调用此函数！
+export function deactivate(): Thenable<any> | undefined {
+  return client?.stop();
+}
+```
+
+<Aside type="note">
+你可能会注意到, 上面的代码导入了 `vscode`, 尽管并没有安装它。这是因为 `vscode` 模块是由 VS Code 本身提供的, 并且默认对扩展可用。
+
+有关此模块及其内容的更多信息, 请查看 [VS Code API 文档](https://code.visualstudio.com/api/references/vscode-api)。
+
+</Aside>
+
+现在客户端已经完成。由于绝大多数实际逻辑将在语言服务器中, 因此即使随着项目复杂性的增长, 您也不太可能需要再次访问客户端。
+
+你的项目结构现在应该是这样的: 
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+- packages/
+  - client/
+    - src/
+      - extension.ts
+    - package.json
+    - tsconfig.json
+  - server/
+    - package.json
+- package.json
+- tsconfig.base.json
+
+</FileTree>
+
+如果你非常好奇, 你可以通过在 VS Code 中运行 `Launch Extension` 任务来立即启动客户端。
+
+由于服务器尚不存在, 因此客户端将无法启动并立即崩溃, 但这将是我们的一个开始！
+
+## 服务器
+
+现在进入项目的核心部分: 语言服务器。本节的大部分内容将花费在连接各个部分上, 而不是编写实际的逻辑。实际的逻辑将非常简单, 因为我们支持的语言也相当简单。
+
+首先, 我们将安装一些依赖项, 就像我们为客户端所做的那样。确保您在正确的文件夹（`packages/server`）中, 并运行以下命令: 
+
+<Tabs>
+<TabItem label="npm">
+
+```sh
+# 使用 npm 安装依赖项
+npm install @volar/language-server @volar/language-core @volar/language-service volar-service-html volar-service-css vscode-html-languageservice
+```
+
+</TabItem>
+
+<TabItem label="pnpm">
+
+```sh
+# 使用 pnpm 安装依赖项
+pnpm install @volar/language-server @volar/language-core @volar/language-service volar-service-html volar-service-css vscode-html-languageservice
+```
+
+</TabItem>
+
+<TabItem label="Yarn">
+
+```sh
+# 使用 yarn 安装依赖项
+yarn add @volar/language-server @volar/language-core @volar/language-service volar-service-html volar-service-css vscode-html-languageservice
+```
+
+</TabItem>
+</Tabs>
+
+与客户端一样, 在 `packages/server` 文件夹中创建一个 `tsconfig.json` 文件以配置 TypeScript。此文件将告诉 TypeScript 将编译后的 JavaScript 文件输出到 `dist` 目录。
+
+```jsonc title="packages/server/tsconfig.json"
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out",
+    "rootDir": "src",
+  },
+  "include": ["src"],
+}
+```
+
+由于语言服务器是可执行程序, 我们需要为服务器创建一个入口点。在 `packages/server` 文件夹中创建一个新的 `bin` 目录, 并添加一个名为 `html1-language-server.js` 的文件。
+
+这个文件将包含一小段代码, 用于启动语言服务器。
+
+```ts title="packages/server/bin/html1-language-server.js"
+#!/usr/bin/env node
+if (process.argv.includes("--version")) {
+  const pkgJSON = require("../package.json");
+  console.log(`${pkgJSON["version"]}`);
+} else {
+  require("../out/index.js");
+}
+```
+
+我们还将更新 `packages/server` 文件夹中的 `package.json` 文件, 以将此文件添加为包提供的可执行文件。
+
+```jsonc title="packages/server/package.json" ins={4-6}
+{
+  "name": "@html1/language-server",
+  "version": "0.0.1",
+  "bin": {
+    "html1-language-server": "./bin/html1-language-server.js",
+  },
+  "dependencies": {
+    // All your dependencies here...
+  },
+}
+```
+
+zh: 现在, 安装您的软件包的人将能够使用 `html1-language-server` 命令运行服务器。另外, 我们还可以通过运行 `html1-language-server --version` 来打印服务器的版本号。
+
+然而, 我们仍然没有实际可以启动的服务器！在 `packages/server` 文件夹中创建一个新的 `src` 目录, 并创建以下三个文件: 
+
+- `index.ts`: 服务器的入口点, 该文件将创建、配置和启动服务器。
+- `html1-service.ts`: 处理 HTML1 语言的 [服务](/reference/services/)。
+- `languagePlugin.ts`: HTML1 语言的 [语言定义](/reference/languages/)。
+
+此时, 您的整个项目结构应如下所示: 
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+- packages/
+  - client/
+    - src/
+      - extension.ts
+    - package.json
+    - tsconfig.json
+  - server/
+    - bin/
+      - html1-language-server.js
+    - src/
+      - index.ts
+      - html1-service.ts
+      - languagePlugin.ts
+    - package.json
+    - tsconfig.json
+- package.json
+- tsconfig.base.json
+
+</FileTree>
+
+### 配置服务器
+
+我们将首先跳转到 `index.ts` 文件。该文件将创建服务器, 配置所有支持的语言和将要使用的不同服务, 然后启动服务器。
+
+```ts title="packages/server/src/index.ts"
+import { html1LanguagePlugin, Html1Code } from "./languagePlugin";
+import { create as createHtmlService } from "volar-service-html";
+import { create as createCssService } from "volar-service-css";
+import {
+  createServer,
+  createConnection,
+  createSimpleProject,
+} from "@volar/language-server/node";
+
+const connection = createConnection();
+const server = createServer(connection);
+
+connection.listen();
+
+connection.onInitialize((params) => {
+  return server.initialize(
+    params,
+    createSimpleProject([
+      // 语言插件, 目前为空
+    ]),
+    [
+      createHtmlService(),
+      createCssService(),
+    ],
+  );
+});
+
+connection.onInitialized(server.initialized);
+connection.onShutdown(server.shutdown);
+```
+
+首先, 我们创建一个连接（`createConnection`）, 然后创建服务器本身。接着, 我们监听连接, 等待客户端连接。
+
+一旦连接完成, 我们初始化服务器, 包括其语言和服务插件。在我们的例子中, 我们还没有任何语言插件, 但我们确实有两个服务插件: 一个用于 HTML, 一个用于 CSS, 这两种语言都是我们的 HTML1 语言将支持的。
+
+### 定义语言
+
+顾名思义, 我们需要定义我们支持的语言。在我们的例子中, 这就是 HTML1。作为提醒, HTML1 是 HTML, 但限制为仅允许一个 `<style>` 标签（此外, 它没有 `script` 标签, 但我们暂时忽略这一点）。
+
+语言定义的核心只是一个 JavaScript 对象, 具有两个方法: 一个用于创建虚拟代码, 一个用于更新它。虚拟代码（`VirtualCode`）是一个表示语言服务器中文件的对象, 用于存储有关文件的信息, 例如其内容、当前版本以及可能有用的任何其他元数据。
+
+每个语言服务器处理的文件都将具有一个对应的 `VirtualCode` 对象。语言服务器将在文件打开时创建这些对象, 并在文件更改时更新它们。
+
+```ts title="packages/server/src/languagePlugin.ts"
+import type { LanguagePlugin } from "@volar/language-core";
+import type { URI } from "vscode-uri";
+
+export const language = {
+  getLanguageId(uri) {
+    if (uri.path.endsWith('.html1')) {
+      return 'html1';
+    }
+  },
+  createVirtualCode(uri, languageId, snapshot) {
+    // 在这里创建虚拟代码对象
+  },
+  updateVirtualCode(uri, languageCode, snapshot) {
+    // 更新虚拟代码对象时会被调用
+  },
+} satisfies LanguagePlugin<URI>;
+```
+
+虽然 `VirtualCode` 对象可以是普通的 JavaScript 对象, 但通常创建一个 JavaScript 类来表示它们是有用的。这个类可以包含处理文件及其相关数据时有用的方法和属性。
+
+```ts title="packages/server/src/languagePlugin.ts" ins={3, 12-14, 17-18, 22-99} ins=/(VirtualCode) }/
+import type { LanguagePlugin, VirtualCode } from "@volar/language-core";
+import type { URI } from "vscode-uri";
+import type * as ts from 'typescript';
+
+export const language = {
+  getLanguageId(uri) {
+    if (uri.path.endsWith('.html1')) {
+      return 'html1';
+    }
+  },
+  createVirtualCode(uri, languageId, snapshot) {
+    if (languageId === "html1") {
+      return new Html1Code(snapshot);
+    }
+  },
+  updateVirtualCode(uri, languageCode, snapshot) {
+    languageCode.update(snapshot);
+    return languageCode;
+  },
+} satisfies LanguagePlugin<URI>;
+
+export class Html1Code implements VirtualCode {
+  id = "root";
+  languageId = "html1";
+  embeddedCodes: VirtualCode[] = [];
+
+  constructor(public snapshot: ts.IScriptSnapshot) {
+    this.onSnapshotUpdated();
+  }
+
+  public update(newSnapshot: ts.IScriptSnapshot) {
+    this.snapshot = newSnapshot;
+    this.onSnapshotUpdated();
+  }
+
+  public onSnapshotUpdated() {
+    // 在这里处理快照更新逻辑
+  }
+}
+```
+
+这个方法将包含在文件更新时执行的所有逻辑。在我们的例子中, 我们将使用此方法来解析文件并理解其结构和内容。
+
+你可能已经注意到 `Html1Code` 类有一个 `embeddedCodes` 属性。这个属性用于存储文件可能包含的 [嵌入式语言](/core-concepts/embedded-languages) 的任何嵌入式 `VirtualCode`。
+
+在我们的例子中, HTML1 将包含两种嵌入式语言: HTML 和 CSS。要找到这些嵌入式语言的位置, 我们需要解析文件并查找 `<style>` 标签。当我们找到它时, 我们将为 HTML 和 CSS 代码创建一个新的 `VirtualCode` 对象, 并将其添加到 `embeddedCodes` 数组中。
+
+我们将使用 `vscode-html-languageservice` 包来解析 HTML 和 CSS 代码, 这个包也是我们之前添加到服务器的 HTML 服务所使用的。
