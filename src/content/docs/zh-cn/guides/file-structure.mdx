@@ -1,0 +1,63 @@
+---
+title: Volar 项目的文件结构
+description: 一个 Volar 项目文件结构的指南。
+---
+
+本指南将向您展示 Volar 项目的组织方式以及项目中不同文件的作用。
+
+## 文件和目录结构
+
+由于需要多个包来运行语言服务器和 VS Code 扩展，Volar 项目通常位于 monorepo 中。这不是一个要求，但它是最常见的设置，也是设置 Volar 项目的推荐方式。
+
+### 服务器 (`packages/language-server`)
+
+与语言服务器相关的所有文件都位于 `packages/language-server` 目录中。
+
+- `package.json` — 语言服务器包的配置，包括其依赖项和主入口点。
+- `bin/server.js` — 语言服务器二进制文件的入口点。此文件负责启动语言服务器。
+- `src/index.ts` — 语言服务器的主文件，设置服务器及其功能。
+- `src/language.ts` — 定义语言功能并提供处理项目文件的方法。
+
+### 客户端 (`packages/vscode`)
+
+与 VS Code 扩展相关的所有文件都位于 `packages/vscode` 目录中。
+
+- `package.json` — VS Code 扩展包的配置，包括其依赖项、主入口点和激活事件。
+- `src/extension.ts` — VS Code 扩展的主文件，设置客户端并激活功能。
+- `scripts/build.js` — 用于构建 VS Code 扩展的脚本。
+
+## 完整示例
+
+您的 Volar 项目在大多数情况下将类似于以下内容：
+
+import { FileTree } from "@astrojs/starlight/components";
+
+<FileTree>
+
+- .vscode/
+  - launch.json
+  - tasks.json
+- packages/
+  - language-server/
+    - bin/
+      - server.js
+    - src/
+      - index.ts
+      - ...
+    - package.json
+    - tsconfig.json
+  - vscode/
+    - scripts/
+      - build.js
+    - src/
+      - extension.ts
+      - ...
+    - .vscodeignore
+    - package.json
+    - tsconfig.json
+- package.json
+- tsconfig.json
+
+</FileTree>
+
+一些通用文件，例如 `README.md`，为了简洁起见被省略了。
